@@ -1,0 +1,16 @@
+{
+  "type": "module",
+  "name": "seq",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@anywidget/types": "^0.1.9",
+    "@anywidget/vite": "^0.2.0",
+    "esbuild": "^0.21.4",
+    "typescript": "^5.4.5",
+    "vite": "^5.3.1"
+  }
+}
