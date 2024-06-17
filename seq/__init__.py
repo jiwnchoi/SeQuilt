@@ -7,7 +7,7 @@ import traitlets
 
 dev = os.environ.get("ANYWIDGET_DEV") == "1"
 
-
+print(dev)
 try:
   __version__ = importlib.metadata.version("seq")
 except importlib.metadata.PackageNotFoundError:
