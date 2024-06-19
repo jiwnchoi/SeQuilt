@@ -9,7 +9,7 @@ interface WidgetModel {
 
 function render({ model, el }: RenderProps<WidgetModel>) {
   let btn = document.createElement("button")
-  btn.innerHTML = `count231 is ${model.get("value")}`
+  btn.innerHTML = `coun22t231 is ${model.get("value")}`
   btn.addEventListener("click", () => {
     model.set("value", model.get("value") + 1)
     model.save_changes()
