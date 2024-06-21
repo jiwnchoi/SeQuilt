@@ -1,13 +1,10 @@
 import type { RenderProps } from "@anywidget/types"
-import "./widget.css"
-
-/* Specifies attributes defined with traitlets in ../src/seq/__init__.py */
-interface WidgetModel {
-  value: number
-  /* Add your own */
-}
+import { WidgetModel } from "@/model"
 
 function render({ model, el }: RenderProps<WidgetModel>) {
+  console.log(model.get("ids"))
+  console.log(model.get("feature_ids"))
+
   let btn = document.createElement("button")
   btn.innerHTML = `coun22t231 is ${model.get("value")}`
   btn.addEventListener("click", () => {
