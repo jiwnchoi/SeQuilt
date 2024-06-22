@@ -1,4 +1,4 @@
-import type { TSequenceModel } from "@/model";
+import type { ILabelModel, TSequenceModel } from "@/model";
 import * as d3 from "d3";
 
 class SequenceView {
@@ -12,7 +12,7 @@ class SequenceView {
 		this.height = height;
 	}
 
-	render(sequences: TSequenceModel[], labels: number[]) {
+	render(sequences: TSequenceModel[], labels: ILabelModel[]) {
 		if (sequences.length === 0 || labels.length === 0) {
 			return;
 		}
@@ -33,20 +33,17 @@ class SequenceView {
 			.selectAll("rect")
 			.data((d) => d)
 			.join("rect")
-			.transition()
 			.attr("x", (_, i) => x(i))
 			.attr("y", 0)
 			.attr("width", x(1) - x(0))
 			.attr("height", y(1) - y(0))
 			.attr("fill", (d) =>
-				labels.includes(d)
-					? d3.schemeCategory10[labels.indexOf(d)]
+				labels.map((l) => l.id).includes(d)
+					? d3.schemeCategory10[labels.findIndex((l) => l.id === d)]
 					: "transparent",
 			)
 			.attr("class", "cell");
-	}
 
-	node() {
 		return this.svg.node();
 	}
 }

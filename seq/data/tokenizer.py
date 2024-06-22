@@ -13,7 +13,7 @@ class NLTKTokenizer:
     tokens = word_tokenize(text)
     for token in tokens:
       if token not in self.token_to_id:
-        self.token_to_id[token] = len(self.token_to_id)
+        self.token_to_id[token] = len(self.token_to_id) + 1
         self.id_to_token[self.token_to_id[token]] = token
 
     return {
@@ -45,8 +45,18 @@ class NLTKTokenizer:
   def get_vocab_size(self) -> int:
     return len(self.token_to_id)
 
+  def token_to_id(self, token: str) -> int | None:
+    if token not in self.token_to_id:
+      return None
+    return self.token_to_id[token]
 
-def get_tokenizer(name: str = "Xenova/gpt-4") -> Tokenizer | NLTKTokenizer:
+  def id_to_token(self, id: int) -> str | None:
+    if id not in self.id_to_token:
+      return None
+    return self.id_to_token[id]
+
+
+def get_tokenizer(name: str = "nltk") -> Tokenizer | NLTKTokenizer:
   if name == "nltk":
     return NLTKTokenizer()
   else:
