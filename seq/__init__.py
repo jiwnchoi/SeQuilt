@@ -27,7 +27,6 @@ class Widget(anywidget.AnyWidget):
   _css = (
     pathlib.Path(__file__).parent / "static" / "widget.css" if not dev else None
   )
-  value = traitlets.Int(0).tag(sync=True)
   ids = traitlets.List([]).tag(sync=True)
   tokens = traitlets.List([]).tag(sync=True)
   feature_ids = traitlets.List([]).tag(sync=True)
@@ -54,7 +53,7 @@ class Widget(anywidget.AnyWidget):
     tf_idf = get_tf_idf_matrix(
       [c["ids"] for c in corpus], self.tokenizer.get_vocab_size()
     )
-    self.ids = [c["ids"].tolist() for c in corpus]
+    self.ids = [c["ids"].tolist() for c in corpus][:300]
 
     mean_tf_idf = tf_idf.mean(axis=0)
     self.feature_ids = np.argsort(mean_tf_idf)[::-1][:n_features].tolist()

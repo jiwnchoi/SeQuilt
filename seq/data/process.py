@@ -102,7 +102,8 @@ def process_corpus(
 ) -> list[Tokenized]:
   return [
     process_text(text, tokenizer, max_tokens, stopwords)
-    for text in tqdm(corpus, desc="Processing Corpus")
+    for text in corpus
+    # for text in tqdm(corpus, desc="Processing Corpus")
   ]
 
 
