@@ -1,4 +1,4 @@
 export default interface IClass {
-  class: number
-  label: string
+	class: number;
+	label: string;
 }

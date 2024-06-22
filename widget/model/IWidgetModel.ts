@@ -1,5 +1,5 @@
 export interface IWidgetModel {
-  value: number
-  ids: number[][]
-  feature_ids: number[]
+	value: number;
+	ids: number[][];
+	feature_ids: number[];
 }

@@ -1,1 +1,1 @@
-export { default as SequenceView } from "./SequenceView"
+export { default as Sequence } from "./Sequence";

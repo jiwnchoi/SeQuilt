@@ -1,3 +1,3 @@
-type TSequenceModel = number[]
+type TSequenceModel = number[];
 
-export default TSequenceModel
+export default TSequenceModel;
