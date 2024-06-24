@@ -6,18 +6,18 @@ from tokenizers import Tokenizer
 
 class NLTKTokenizer:
   def __init__(self):
-    self.token_to_id = {}
-    self.id_to_token = {}
+    self._token_to_id = {"[MASK]": 0}
+    self._id_to_token = {0: "[MASK]"}
 
   def encode(self, text: str) -> list[str]:
     tokens = word_tokenize(text)
     for token in tokens:
-      if token not in self.token_to_id:
-        self.token_to_id[token] = len(self.token_to_id) + 1
-        self.id_to_token[self.token_to_id[token]] = token
+      if token not in self._token_to_id:
+        self._token_to_id[token] = len(self._token_to_id) + 1
+        self._id_to_token[self._token_to_id[token]] = token
 
     return {
-      "ids": [self.token_to_id[token] for token in tokens],
+      "ids": [self._token_to_id[token] for token in tokens],
       "tokens": tokens,
     }
 
@@ -34,26 +34,26 @@ class NLTKTokenizer:
       return " ".join(tokens)
 
     else:
-      return " ".join([self.id_to_token[id] for id in ids])
+      return " ".join([self._id_to_token[id] for id in ids])
 
   def decode_batch(self, batch: list[dict]) -> list[str]:
     return [self.decode(**item) for item in batch]
 
   def get_vocab(self) -> dict:
-    return self.token_to_id
+    return self._token_to_id
 
   def get_vocab_size(self) -> int:
-    return len(self.token_to_id)
+    return len(self._token_to_id)
 
   def token_to_id(self, token: str) -> int | None:
-    if token not in self.token_to_id:
+    if token not in self._token_to_id:
       return None
-    return self.token_to_id[token]
+    return self._token_to_id[token]
 
   def id_to_token(self, id: int) -> str | None:
-    if id not in self.id_to_token:
+    if id not in self._id_to_token:
       return None
-    return self.id_to_token[id]
+    return self._id_to_token[id]
 
 
 def get_tokenizer(name: str = "nltk") -> Tokenizer | NLTKTokenizer:

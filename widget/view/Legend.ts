@@ -45,7 +45,7 @@ class Legend {
 					(label, index) => html`
           <li style=${styleMap(liStyle)}>
             <div style="${styleMap(spanStyle(size, colorScale[index]))}"></div>
-            ${label.token}
+            ${label.label}
             
           </li>
         `,
