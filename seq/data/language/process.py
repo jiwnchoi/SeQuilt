@@ -98,7 +98,7 @@ def get_ids(
   tokenizer: Tokenizer | NLTKTokenizer,
   max_tokens: int = 16,
   stopwords: list[str] = stopwords.words("english"),
-) -> tuple[list[np.ndarray], list[np.ndarray]]:
+) -> tuple[np.ndarray, list[np.ndarray]]:
   ids = []
   tokens = []
 
@@ -107,7 +107,7 @@ def get_ids(
     ids.append(tokenized["ids"])
     tokens.append(tokenized["tokens"])
 
-  return ids, tokens
+  return np.array(ids), tokens
 
 
 def get_featured_ids(

@@ -19,13 +19,13 @@ function renderWidget({ model, el }: RenderProps<IWidgetModel>) {
 
 	render(
 		html`
-    <div id="sequences-view">
+    <div id="sequences-view" style="background-color: transparent;">
       ${legendView.render(model.get("labels"))}
       ${sequenceView.render(model.get("sequences"), model.get("labels"))}
     </div>`,
 		widget,
 	);
-
+	el.style.backgroundColor = "transparent";
 	el.appendChild(widget);
 }
 
