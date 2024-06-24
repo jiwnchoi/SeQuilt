@@ -6,11 +6,10 @@ import { Legend } from "./view";
 
 function renderWidget({ model, el }: RenderProps<IWidgetModel>) {
 	const widget = document.createElement("div");
-	const sequenceView = new SeqeuenceView(800, 300);
+	const sequenceView = new SeqeuenceView(800, 800);
 	const legendView = new Legend();
 
 	model.on("change:sequences", () => {
-		console.log("changed");
 		sequenceView.render(model.get("sequences"), model.get("labels"));
 	});
 

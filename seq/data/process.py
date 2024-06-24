@@ -71,7 +71,11 @@ def _fix_length(
 def _filter_english(text: str) -> str:
   text = text.lower()
   text = re.sub(r"<.*?>", "", text)
-  return re.sub(r"[^a-zA-Z\s]", "", text)
+  text = re.sub(r"<.*?>", "", text)
+
+  text = re.sub(r"'", " ", text)
+  text = re.sub(r"[^a-zA-Z\s]", "", text)
+  return text
 
 
 def _filter_stopwords(text: str, stopwords: list[str]) -> str:

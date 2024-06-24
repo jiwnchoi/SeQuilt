@@ -37,6 +37,8 @@ class SequenceView {
 			.attr("y", 0)
 			.attr("width", x(1) - x(0))
 			.attr("height", y(1) - y(0))
+			.attr("stroke", "#F2F2F2")
+			.attr("stroke-width", 0.1)
 			.attr("fill", (d) =>
 				labels.map((l) => l.id).includes(d)
 					? d3.schemeCategory10[labels.findIndex((l) => l.id === d)]

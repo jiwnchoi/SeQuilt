@@ -2,6 +2,28 @@ import type { ILabelModel } from "@/model";
 import { schemeCategory10 } from "d3";
 import { html, render } from "lit-html";
 import { repeat } from "lit-html/directives/repeat.js";
+import { styleMap } from "lit-html/directives/style-map.js";
+
+const ulStyle = {
+	listStyleType: "none",
+	padding: "0",
+	display: "flex",
+	flexDirection: "row",
+	gap: "8px",
+};
+
+const liStyle = {
+	display: "flex",
+	alignItems: "center",
+	gap: "4px",
+};
+
+const spanStyle = (size: number, bgColor: string) => ({
+	display: "inline-block",
+	width: `${size}px`,
+	height: `${size}px`,
+	backgroundColor: bgColor,
+});
 
 class Legend {
 	container: HTMLElement;
@@ -14,22 +36,24 @@ class Legend {
 		const colorScale = schemeCategory10;
 		const size = 10;
 
-		const legendTemplate = html`
-      <ul style="list-style-type: none; padding: 0; display: flex; flex-direction: row; gap: 8px;">
+		render(
+			html`
+      <ul style=${styleMap(ulStyle)}>
         ${repeat(
 					labels,
-					(label) => label.id,
+					(label) => `label-${label.id}`,
 					(label, index) => html`
-          <li style="display: flex; align-items: center; gap: 4px;">
-            <span style="display: inline-block; width: ${size}px; height: ${size}px; background-color: ${colorScale[index % colorScale.length]};"></span>
+          <li style=${styleMap(liStyle)}>
+            <div style="${styleMap(spanStyle(size, colorScale[index]))}"></div>
             ${label.token}
+            
           </li>
         `,
 				)}
       </ul>
-    `;
-
-		render(legendTemplate, this.container);
+    `,
+			this.container,
+		);
 		return this.container;
 	}
 }

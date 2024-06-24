@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "seq"
 version = "0.0.0"
-dependencies = ["anywidget", "datasets", "pandas", "tokenizers", "nltk"]
+dependencies = ["anywidget", "datasets", "pandas", "tokenizers", "nltk", "networkx"]
 readme = "README.md"
 
 [project.optional-dependencies]
