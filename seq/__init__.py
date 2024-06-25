@@ -73,7 +73,7 @@ class Widget(anywidget.AnyWidget):
     print("Sequences: ", _sequences.shape)
 
     self.n_sequences, self.n_length = _sequences.shape
-    self.sequences = sequences
+    self.sequences = _sequences
     self.rects = self.get_rects(_sequences)
     print("Rects: ", len(self.rects))
 
