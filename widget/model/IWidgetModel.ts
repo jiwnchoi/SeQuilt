@@ -6,4 +6,6 @@ export interface IWidgetModel {
 	labels: ILabelModel[];
 	n_sequences: number;
 	n_length: number;
+	width: number;
+	height: number;
 }

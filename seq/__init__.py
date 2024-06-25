@@ -33,12 +33,17 @@ class Widget(anywidget.AnyWidget):
   n_sequences = traitlets.Int(0).tag(sync=True)
   n_length = traitlets.Int(0).tag(sync=True)
 
+  width = traitlets.Int(800).tag(sync=True)
+  height = traitlets.Int(600).tag(sync=True)
+
   sequences: np.ndarray
 
   def __init__(
     self,
     sequences: list[list[int]] | np.ndarray,
     labels: list[LabelModel] | list[int],
+    width: int = 800,
+    height: int = 600,
     *args,
     **kwargs,
   ) -> None:
@@ -51,6 +56,9 @@ class Widget(anywidget.AnyWidget):
     )
     self.featured_ids = [label["id"] for label in self.labels]
     self.update_sequences(sequences)
+
+    self.width = width
+    self.height = height
 
   def update_sequences(self, sequences: list[list[int]] | np.ndarray) -> None:
     _sequences = (

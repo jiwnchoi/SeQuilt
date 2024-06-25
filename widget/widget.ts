@@ -6,7 +6,11 @@ import { html, render } from "lit-html";
 function renderWidget({ model, el }: RenderProps<IWidgetModel>) {
 	const widget = document.createElement("div");
 	widget.id = "widget";
-	const sequenceView = new Sequence(800, 400);
+
+	const width = model.get("width");
+	const height = model.get("height");
+
+	const sequenceView = new Sequence(width, height);
 	const legendView = new Legend();
 
 	model.on("change:rects", () => {
