@@ -1,5 +1,7 @@
 import type { ILabelModel, TSequenceModel } from "@/model";
 import * as d3 from "d3";
+import { html, svg } from "lit-html";
+import { repeat } from "lit-html/directives/repeat.js";
 
 class SequenceView {
 	svg: d3.Selection<SVGSVGElement, undefined, null, undefined>;
@@ -12,7 +14,7 @@ class SequenceView {
 		this.height = height;
 	}
 
-	render(sequences: TSequenceModel[], labels: ILabelModel[]) {
+	_render(sequences: TSequenceModel[], labels: ILabelModel[]) {
 		if (sequences.length === 0 || labels.length === 0) {
 			return;
 		}
@@ -46,9 +48,44 @@ class SequenceView {
 					: "transparent",
 			)
 			.attr("class", "cell");
-
+	}
+	render(sequences: TSequenceModel[], labels: ILabelModel[]) {
+		this._render(sequences, labels);
 		return this.svg.node();
 	}
+
+	// 	return html`
+	//     <svg viewBox="0 0 ${this.width} ${this.height}">
+	//       ${repeat(
+	// 				sequences,
+	// 				(_, i) => `sequence-${i}`,
+	// 				(sequence, i) => svg`
+	//           <g transform="translate(0, ${y(i)})">
+	//             ${repeat(
+	// 							sequence,
+	// 							(d) => d,
+	// 							(d, j) => svg`
+	//                 <rect
+	//                   x="${x(j)}"
+	//                   y="0"
+	//                   width="${x(1) - x(0)}"
+	//                   height="${y(1) - y(0)}"
+	//                   fill="${
+	// 										labels.map((l) => l.id).includes(d)
+	// 											? d3.schemeCategory10[
+	// 													labels.findIndex((l) => l.id === d)
+	// 												]
+	// 											: "transparent"
+	// 									}"
+	//                   class="cell"
+	//                 ></rect>
+	//               `,
+	// 						)}
+	//           </g>
+	//         `,
+	// 			)}
+	//     </svg>
+	//   `;
 }
 
 export default SequenceView;

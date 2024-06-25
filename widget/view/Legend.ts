@@ -1,6 +1,6 @@
 import type { ILabelModel } from "@/model";
 import { schemeCategory10 } from "d3";
-import { html, render } from "lit-html";
+import { html } from "lit-html";
 import { repeat } from "lit-html/directives/repeat.js";
 import { styleMap } from "lit-html/directives/style-map.js";
 
@@ -35,9 +35,7 @@ class Legend {
 	render(labels: ILabelModel[]) {
 		const colorScale = schemeCategory10;
 		const size = 10;
-
-		render(
-			html`
+		return html`
       <ul style=${styleMap(ulStyle)}>
         ${repeat(
 					labels,
@@ -46,15 +44,11 @@ class Legend {
           <li style=${styleMap(liStyle)}>
             <div style="${styleMap(spanStyle(size, colorScale[index]))}"></div>
             ${label.label}
-            
           </li>
         `,
 				)}
       </ul>
-    `,
-			this.container,
-		);
-		return this.container;
+    `;
 	}
 }
 

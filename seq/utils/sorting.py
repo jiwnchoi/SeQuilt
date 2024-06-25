@@ -3,7 +3,7 @@ from __future__ import annotations
 import networkx as nx
 import numpy as np
 
-from .distance import get_distance
+from .distance import get_distance, get_distance_numba
 
 
 def sort_sequences(sequences: list[list[int]] | np.ndarray) -> np.ndarray:
@@ -11,7 +11,7 @@ def sort_sequences(sequences: list[list[int]] | np.ndarray) -> np.ndarray:
     sequences = np.array(sequences)
 
   unique_sequences, count = np.unique(sequences, axis=0, return_counts=True)
-  dist_matrix = get_distance(unique_sequences)
+  dist_matrix = get_distance_numba(unique_sequences)
 
   G = nx.Graph()
   for i in range(len(dist_matrix)):
