@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from nltk.tokenize import word_tokenize
-from tokenizers import Tokenizer
+
+from seq.model import TokenizerModel
 
 
-class NLTKTokenizer:
+class NLTKTokenizer(TokenizerModel):
   def __init__(self):
-    self._token_to_id = {"[MASK]": 0}
-    self._id_to_token = {0: "[MASK]"}
+    super().__init__()
 
   def encode(self, text: str) -> list[str]:
     tokens = word_tokenize(text)
@@ -56,12 +56,4 @@ class NLTKTokenizer:
     return self._id_to_token[id]
 
 
-def get_tokenizer(name: str = "nltk") -> Tokenizer | NLTKTokenizer:
-  if name == "nltk":
-    return NLTKTokenizer()
-  else:
-    _tokenizer: Tokenizer = Tokenizer.from_pretrained(name)
-    return _tokenizer
-
-
-__all__ = ["get_tokenizer", "NLTKTokenizer"]
+__all__ = ["NLTKTokenizer"]

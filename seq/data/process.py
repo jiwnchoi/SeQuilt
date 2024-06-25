@@ -1,21 +1,22 @@
 from __future__ import annotations
 
 import re
-from typing import Any
+from typing import Any, Literal
 
 import numpy as np
 from nltk.corpus import stopwords
 from tokenizers import Encoding, Tokenizer
 from tqdm import tqdm
 
-from seq.model import TokenizedModel
+from seq.model import TokenizedModel, TokenizerModel
 
-from .tokenizer import NLTKTokenizer
+from .dna import DNATokenizer
+from .language import NLTKTokenizer
 
 
 def _encode_batch(
   text_batch: list[str],
-  tokenizer: Tokenizer | NLTKTokenizer,
+  tokenizer: TokenizerModel,
 ) -> list[TokenizedModel]:
   tokenized_batch = tokenizer.encode_batch(text_batch)
   return [
@@ -34,7 +35,7 @@ def _encode_batch(
 
 def _encode(
   text: str,
-  tokenizer: Tokenizer | NLTKTokenizer,
+  tokenizer: TokenizerModel,
 ) -> TokenizedModel:
   tokenized = tokenizer.encode(text)
   return (
@@ -77,9 +78,22 @@ def _filter_stopwords(text: str, stopwords: list[str]) -> str:
   return " ".join([word for word in text.split() if word not in stopwords])
 
 
+def _process_dna(
+  dna: str,
+  tokenizer: DNATokenizer,
+  max_tokens: int = 16,
+) -> TokenizedModel:
+  tokenized = _encode(dna, tokenizer)
+
+  return {
+    "ids": _fix_length(tokenized["ids"], max_tokens),
+    "tokens": _fix_length(tokenized["tokens"], max_tokens, "[MASK]"),
+  }
+
+
 def _process_text(
   text: str,
-  tokenizer: Tokenizer | NLTKTokenizer,
+  tokenizer: NLTKTokenizer,
   max_tokens: int = 16,
   stopwords: list[str] = stopwords.words("english"),
 ) -> TokenizedModel:
@@ -93,9 +107,22 @@ def _process_text(
   }
 
 
+def _process_dna(
+  dna: str,
+  tokenizer: DNATokenizer,
+  max_tokens: int = 16,
+) -> TokenizedModel:
+  tokenized = _encode(dna, tokenizer)
+
+  return {
+    "ids": _fix_length(tokenized["ids"], max_tokens),
+    "tokens": _fix_length(tokenized["tokens"], max_tokens, "[MASK]"),
+  }
+
+
 def get_ids(
   corpus: list[str],
-  tokenizer: Tokenizer | NLTKTokenizer,
+  tokenizer: TokenizerModel,
   max_tokens: int = 16,
   stopwords: list[str] = stopwords.words("english"),
 ) -> tuple[np.ndarray, list[np.ndarray]]:
@@ -103,41 +130,71 @@ def get_ids(
   tokens = []
 
   for text in tqdm(corpus):
-    tokenized = _process_text(text, tokenizer, max_tokens, stopwords)
+    if isinstance(tokenizer, DNATokenizer) == "dna":
+      tokenized = _process_dna(text, tokenizer, max_tokens)
+    if isinstance(tokenizer, NLTKTokenizer) == "language":
+      tokenized = _process_text(text, tokenizer, max_tokens, stopwords)
+    else:
+      encoded = _encode(text, tokenizer)
+      tokenized = {
+        "ids": _fix_length(encoded["ids"], max_tokens),
+        "tokens": _fix_length(encoded["tokens"], max_tokens, "[MASK]"),
+      }
     ids.append(tokenized["ids"])
     tokens.append(tokenized["tokens"])
 
   return np.array(ids), tokens
 
 
-def tf_idf(size: tuple, ids: np.ndarray) -> np.ndarray:
+def _get_doc_term_matrix(size: tuple[int, int], ids: np.ndarray) -> np.ndarray:
   doc_term_matrix = np.zeros(size, dtype=np.float32)
 
   for i, id in enumerate(ids):
     doc_term_matrix[i, id] += 1
+  doc_term_matrix[:, 0] = 0
+  return doc_term_matrix
 
+
+def _tf_idf(doc_term_matrix: np.ndarray) -> np.ndarray:
   tf = doc_term_matrix / np.sum(doc_term_matrix, axis=1)[:, np.newaxis]
-  idf = np.log(len(ids) / (1 + np.sum(doc_term_matrix > 0, axis=0)))
-
+  idf = np.log(
+    doc_term_matrix.shape[0] / (1 + np.sum(doc_term_matrix > 0, axis=0))
+  )
   return tf * idf
+
+
+def get_tokenizer(
+  type: Literal["language", "dna"] | str, *args, **kwargs
+) -> TokenizerModel | Tokenizer:
+  if type == "language":
+    return NLTKTokenizer(*args, **kwargs)
+  if type == "dna":
+    return DNATokenizer(*args, **kwargs)
+  else:
+    return Tokenizer.from_pretrained(type, *args, **kwargs)
 
 
 def get_featured_ids(
   ids: list[np.ndarray],
-  tokenizer: Tokenizer | NLTKTokenizer,
+  tokenizer: TokenizerModel,
+  method: Literal["tf-idf", "count"] = "count",
   n_features: int = 10,
 ) -> np.ndarray:
   size = (len(ids), tokenizer.get_vocab_size() + 1)
-  tf_idf_matrix = tf_idf(size, np.array(ids))
-  tf_idf_matrix[:, 0] = 0
-  # tf_idf_matrix = tf_idf(size, np.array(ids))
-  mean_tf_idf = tf_idf_matrix.mean(axis=0)
+  doc_term_matrix = _get_doc_term_matrix(size, np.array(ids))
 
-  return np.argsort(mean_tf_idf)[::-1][:n_features].tolist()
+  if method == "tf-idf":
+    tf_idf_matrix = _tf_idf(doc_term_matrix)
+    mean_tf_idf = tf_idf_matrix.mean(axis=0)
+    return np.argsort(mean_tf_idf)[::-1][:n_features].tolist()
+
+  if method == "count":
+    mean_count = doc_term_matrix.mean(axis=0)
+    return np.argsort(mean_count)[::-1][:n_features].tolist()
 
 
 __all__ = [
-  "_process_text",
+  "get_tokenizer",
   "get_ids",
   "get_featured_ids",
 ]
