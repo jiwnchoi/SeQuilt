@@ -1,7 +1,8 @@
-import type { ILabelModel, TSequenceModel } from "@/model";
+import type { IRectModel, IWidgetModel } from "@/model";
+import { AnyModel } from "@anywidget/types";
 import * as d3 from "d3";
-import { html, svg } from "lit-html";
-import { repeat } from "lit-html/directives/repeat.js";
+// import { html, svg } from "lit-html";
+// import { repeat } from "lit-html/directives/repeat.js";
 
 class Sequence {
 	svg: d3.Selection<SVGSVGElement, undefined, null, undefined>;
@@ -14,78 +15,38 @@ class Sequence {
 		this.height = height;
 	}
 
-	_render(sequences: TSequenceModel[], labels: ILabelModel[]) {
-		if (sequences.length === 0 || labels.length === 0) {
+	_render(model: AnyModel<IWidgetModel>) {
+		const rects = model.get("rects");
+		const labels = model.get("labels");
+		const sequenceLength = model.get("n_length");
+		const numSequences = model.get("n_sequences");
+		if (rects.length === 0 || labels.length === 0) {
 			return;
 		}
 
-		const windowLength = sequences[0].length;
+		const x = d3.scaleLinear([0, this.width]).domain([0, sequenceLength]);
+		const y = d3.scaleLinear([0, this.height]).domain([0, numSequences]);
 
-		const x = d3.scaleLinear().domain([0, windowLength]).range([0, this.width]);
-		const y = d3
-			.scaleLinear()
-			.domain([0, sequences.length])
-			.range([0, this.height]);
+		const color = d3
+			.scaleOrdinal(d3.schemeCategory10)
+			.domain(labels.map((label) => label.id.toString()));
 
 		this.svg
-			.selectAll("g")
-			.data(sequences)
-			.join("g")
-			.attr("transform", (_, i) => `translate(0, ${y(i)})`)
-			// .attr("stroke", "#F2F2F2")
 			.selectAll("rect")
-			.data((d) => d)
+			.data(rects)
 			.join("rect")
-			.attr("x", (_, i) => x(i))
-			.attr("y", 0)
+			.attr("fill", (d: IRectModel) => color(d.id.toString()))
+			// .transition() Column으로 Groupby 한다음에 Column 별로 Transition 적용되게 변경
+			.attr("x", (d) => x(d.x))
+			.attr("y", (d) => y(d.y_start))
 			.attr("width", x(1) - x(0))
-			.attr("height", y(1) - y(0))
-			// .attr("stroke", "#F2F2F2")
-			// .attr("stroke-width", 0.1)
-			.attr("fill", (d) =>
-				labels.map((l) => l.id).includes(d)
-					? d3.schemeCategory10[labels.findIndex((l) => l.id === d)]
-					: "transparent",
-			)
-			.attr("class", "cell");
-	}
-	render(sequences: TSequenceModel[], labels: ILabelModel[]) {
-		this._render(sequences, labels);
-		return this.svg.node();
+			.attr("height", (d) => y(d.y_end + 1) - y(d.y_start));
 	}
 
-	// 	return html`
-	//     <svg viewBox="0 0 ${this.width} ${this.height}">
-	//       ${repeat(
-	// 				sequences,
-	// 				(_, i) => `sequence-${i}`,
-	// 				(sequence, i) => svg`
-	//           <g transform="translate(0, ${y(i)})">
-	//             ${repeat(
-	// 							sequence,
-	// 							(d) => d,
-	// 							(d, j) => svg`
-	//                 <rect
-	//                   x="${x(j)}"
-	//                   y="0"
-	//                   width="${x(1) - x(0)}"
-	//                   height="${y(1) - y(0)}"
-	//                   fill="${
-	// 										labels.map((l) => l.id).includes(d)
-	// 											? d3.schemeCategory10[
-	// 													labels.findIndex((l) => l.id === d)
-	// 												]
-	// 											: "transparent"
-	// 									}"
-	//                   class="cell"
-	//                 ></rect>
-	//               `,
-	// 						)}
-	//           </g>
-	//         `,
-	// 			)}
-	//     </svg>
-	//   `;
+	render(model: AnyModel<IWidgetModel>) {
+		this._render(model);
+		return this.svg.node();
+	}
 }
 
 export default Sequence;

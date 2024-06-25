@@ -19,17 +19,20 @@ def get_distance(x: np.ndarray) -> np.ndarray:
 def get_distance_numba(x: np.ndarray) -> np.ndarray:
   n = x.shape[0]
   m = x.shape[1]
-  distances = np.zeros((n, n), dtype=np.float64)
+  v_size = n * (n - 1) // 2
+  v = np.zeros(v_size, dtype=np.float64)
 
+  idx = 0
   for i in range(n):
     for j in range(i + 1, n):
       dist = 0
       for k in range(m):
         if x[i, k] != x[j, k] or (x[i, k] == 0 and x[j, k] == 0):
           dist += 1
-      distances[i, j] = distances[j, i] = dist / m
+      v[idx] = dist / m
+      idx += 1
 
-  return distances
+  return v
 
 
 __all__ = ["get_distance"]

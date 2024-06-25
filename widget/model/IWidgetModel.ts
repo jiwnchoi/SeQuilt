@@ -1,7 +1,9 @@
 import type ILabelModel from "./ILabelModel";
-import type TSequenceModel from "./TSequenceModel";
+import type IRectModel from "./IRectModel";
 
 export interface IWidgetModel {
-	sequences: TSequenceModel[];
+	rects: IRectModel[];
 	labels: ILabelModel[];
+	n_sequences: number;
+	n_length: number;
 }

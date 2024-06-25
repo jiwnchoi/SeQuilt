@@ -1,6 +1,6 @@
+import anywidget from "@anywidget/vite";
 // vite.config.js
 import { defineConfig } from "vite";
-import anywidget from "@anywidget/vite";
 
 export default defineConfig({
 	plugins: [anywidget()],
@@ -15,6 +15,11 @@ export default defineConfig({
 		lib: {
 			entry: "widget/widget.ts",
 			formats: ["es"],
+		},
+	},
+	resolve: {
+		alias: {
+			"@/": "/widget/",
 		},
 	},
 });
