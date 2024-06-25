@@ -28,6 +28,6 @@
 	},
 	"lint-staged": {
 		"*.{js,ts,tsx,css,html,json}": ["biome check --write"],
-		"*.{py}": ["hatch fmt"]
+		"*.{py,pyi,pyc}": ["hatch fmt"]
 	}
 }
