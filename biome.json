@@ -13,6 +13,9 @@
       "style": {
         "noCommaOperator": "off"
       }
-    }
+    },
+    "include": [
+      "widget/**/*.{js,ts}"
+    ]
   }
 }

@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import { html, svg } from "lit-html";
 import { repeat } from "lit-html/directives/repeat.js";
 
-class SequenceView {
+class Sequence {
 	svg: d3.Selection<SVGSVGElement, undefined, null, undefined>;
 	width: number;
 	height: number;
@@ -88,4 +88,4 @@ class SequenceView {
 	//   `;
 }
 
-export default SequenceView;
+export default Sequence;

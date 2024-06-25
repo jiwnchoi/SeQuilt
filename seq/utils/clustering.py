@@ -6,7 +6,7 @@ import numpy as np
 from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.spatial.distance import squareform
 
-from .distance import get_distance, get_distance_numba
+from .distance import get_distance_numba
 
 sys.setrecursionlimit(10**9)
 

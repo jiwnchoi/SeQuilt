@@ -3,7 +3,7 @@ from __future__ import annotations
 import networkx as nx
 import numpy as np
 
-from .distance import get_distance, get_distance_numba
+from .distance import get_distance_numba
 
 
 def sort_sequences(sequences: list[list[int]] | np.ndarray) -> np.ndarray:
