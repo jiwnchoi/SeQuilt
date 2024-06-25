@@ -25,9 +25,9 @@ class Widget(anywidget.AnyWidget):
     if not dev
     else "http://localhost:5173/widget/widget.ts?anywidget"
   )
-  _css = (
-    pathlib.Path(__file__).parent / "static" / "widget.css" if not dev else None
-  )
+  # _css = (
+  #   pathlib.Path(__file__).parent / "static" / "widget.css" if not dev else None
+  # )
   sequences = traitlets.List([]).tag(sync=True)
   labels = traitlets.List([]).tag(sync=True)
 

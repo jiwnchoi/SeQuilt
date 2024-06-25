@@ -110,24 +110,28 @@ def get_ids(
   return np.array(ids), tokens
 
 
+def tf_idf(size: tuple, ids: np.ndarray) -> np.ndarray:
+  doc_term_matrix = np.zeros(size, dtype=np.float32)
+
+  for i, id in enumerate(ids):
+    doc_term_matrix[i, id] += 1
+
+  tf = doc_term_matrix / np.sum(doc_term_matrix, axis=1)[:, np.newaxis]
+  idf = np.log(len(ids) / (1 + np.sum(doc_term_matrix > 0, axis=0)))
+
+  return tf * idf
+
+
 def get_featured_ids(
   ids: list[np.ndarray],
   tokenizer: Tokenizer | NLTKTokenizer,
   n_features: int = 10,
 ) -> np.ndarray:
-  doc_term_matrix = np.zeros(
-    (len(ids), tokenizer.get_vocab_size()), dtype=np.float32
-  )
-
-  for i, id in enumerate(ids):
-    doc_term_matrix[i, id] += 1
-
-  tf: np.ndarray = doc_term_matrix / doc_term_matrix.sum(axis=1, keepdims=True)
-  idf: np.ndarray = np.log(len(ids) / (1 + (doc_term_matrix > 0).sum(axis=0)))
-
-  tf_idf = tf * idf
-
-  mean_tf_idf = tf_idf.mean(axis=0)
+  size = (len(ids), tokenizer.get_vocab_size() + 1)
+  tf_idf_matrix = tf_idf(size, np.array(ids))
+  tf_idf_matrix[:, 0] = 0
+  # tf_idf_matrix = tf_idf(size, np.array(ids))
+  mean_tf_idf = tf_idf_matrix.mean(axis=0)
 
   return np.argsort(mean_tf_idf)[::-1][:n_features].tolist()
 

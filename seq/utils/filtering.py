@@ -11,7 +11,12 @@ def filter_sequences(
     sequences = np.array(sequences)
   sequences = sequences.copy()
   mask = sequences > 0
-  return sequences[np.sum(mask, axis=1) >= filter_length]
+
+  new_sequences = sequences[np.sum(mask, axis=1) >= filter_length]
+  if new_sequences.shape[0] == 0:
+    raise ValueError("No remaining sequences after filtering.")
+
+  return new_sequences
 
 
 __all__ = ["filter_sequences"]
