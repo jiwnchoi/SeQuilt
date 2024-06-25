@@ -36,6 +36,7 @@ class Widget(anywidget.AnyWidget):
   width = traitlets.Int(800).tag(sync=True)
   height = traitlets.Int(600).tag(sync=True)
 
+  grid = traitlets.Bool(False).tag(sync=True)
   sequences: np.ndarray
 
   def __init__(
@@ -44,6 +45,7 @@ class Widget(anywidget.AnyWidget):
     labels: list[LabelModel] | list[int],
     width: int = 800,
     height: int = 600,
+    grid: bool = False,
     *args,
     **kwargs,
   ) -> None:
@@ -59,6 +61,7 @@ class Widget(anywidget.AnyWidget):
 
     self.width = width
     self.height = height
+    self.grid = grid
 
   def update_sequences(self, sequences: list[list[int]] | np.ndarray) -> None:
     _sequences = (

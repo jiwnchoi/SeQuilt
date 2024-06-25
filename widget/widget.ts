@@ -16,6 +16,9 @@ function renderWidget({ model, el }: RenderProps<IWidgetModel>) {
 	model.on("change:rects", () => {
 		sequenceView._render(model);
 	});
+	model.on("change:grid", () => {
+		sequenceView._render(model);
+	});
 
 	render(
 		html`

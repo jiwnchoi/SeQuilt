@@ -8,4 +8,5 @@ export interface IWidgetModel {
 	n_length: number;
 	width: number;
 	height: number;
+	grid: boolean;
 }
