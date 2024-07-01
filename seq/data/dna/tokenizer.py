@@ -4,16 +4,15 @@ from seq.model import TokenizerModel
 
 
 class DNATokenizer(TokenizerModel):
-  def __init__(self, k_mer: int = 3):
+  def __init__(self, k: int = 3):
     super().__init__()
 
-    self.k_mer = k_mer
+    self.k = k
 
   def encode(self, text: str) -> list[str]:
     # Split the text into k-mers. ignore remaining characters
     tokens = [
-      text[i * self.k_mer : (i + 1) * self.k_mer]
-      for i in range(len(text) // self.k_mer)
+      text[i * self.k : (i + 1) * self.k] for i in range(len(text) // self.k)
     ]
 
     for token in tokens:
