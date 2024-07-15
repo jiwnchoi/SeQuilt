@@ -17,7 +17,7 @@ class DNATokenizer(TokenizerModel):
 
     for token in tokens:
       if token not in self._token_to_id:
-        self._token_to_id[token] = len(self._token_to_id) + 1
+        self._token_to_id[token] = len(self._token_to_id)
         self._id_to_token[self._token_to_id[token]] = token
 
     return {
