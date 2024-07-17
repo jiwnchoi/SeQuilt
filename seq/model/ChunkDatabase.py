@@ -4,6 +4,7 @@ from collections import defaultdict
 from typing import Hashable, Literal
 
 import numpy as np
+from tqdm import tqdm
 
 from .Chunk import Chunk
 
@@ -43,7 +44,6 @@ class ChunkDatabase:
     self.continue_map = defaultdict(list)
     self.seq_map = defaultdict(list)
     self.length_map = defaultdict(list)
-
     self.find_chunks()
 
   def __getitem__(self, key: Hashable) -> Chunk | None:
@@ -59,49 +59,44 @@ class ChunkDatabase:
     )
 
   def find_chunks(self):
-    for chunk_length in range(self.max_chunk_length, 0, -1):
-      # Create a view of all possible chunks of the current length
+    data = self.data.copy()
+
+    for chunk_length in tqdm(range(self.max_chunk_length, 0, -1)):
       chunk_view = np.lib.stride_tricks.sliding_window_view(
-        self.data, (1, chunk_length)
+        data, (1, chunk_length)
       ).reshape(
         self.n_sequences, self.seq_length - chunk_length + 1, chunk_length
       )
 
-      # Hash each chunk
-      chunk_hashes = np.apply_along_axis(
-        lambda x: hash(tuple(x)), 2, chunk_view
-      )
+      for i in range(chunk_view.shape[1]):
+        chunk_dict = defaultdict(list)
+        for seq_idx, chunk in enumerate(chunk_view[:, i]):
+          chunk_dict[tuple(chunk)].append(seq_idx)
 
-      # Find unique chunks and their counts
-      unique_chunks, indices, counts = np.unique(
-        chunk_hashes, return_inverse=True, return_counts=True, axis=None
-      )
+        for chunk, seq_indices in chunk_dict.items():
+          chunk = np.array(chunk)
+          count = len(seq_indices)
 
-      # Process only chunks that meet the threshold
-      mask = counts >= self.min_n_chunks
-      for chunk_hash in unique_chunks[mask]:
-        # Get the indices of sequences containing this chunk
-        seq_indices = np.where(chunk_hashes == chunk_hash)[0]
+          if np.any(chunk == 0) or (
+            chunk_length > 1 and count < self.min_n_chunks
+          ):
+            continue
 
-        # Get the start position of the chunk
-        start = np.where(chunk_hashes == chunk_hash)[1][0]
-        end = start + chunk_length
+          seq_indices = np.array(seq_indices)
+          data[seq_indices, i : i + chunk_length] = 0
 
-        # Get the actual chunk sequence
-        chunk_seq = chunk_view[seq_indices[0], start]
-
-        self.add(
-          Chunk(
-            subsequence=chunk_seq,
-            start=int(start),
-            end=int(end),
-            seq_indices=seq_indices,
+          self.add(
+            Chunk(
+              start=i,
+              end=i + chunk_length,
+              subsequence=chunk,
+              seq_indices=set(seq_indices),
+            )
           )
-        )
 
   def add(self, chunk: Chunk):
     if chunk in self._chunks:
-      self._chunks[chunk].seq_indices.extend(chunk.seq_indices)
+      self._chunks[chunk].seq_indices.update(chunk.seq_indices)
     else:
       self._chunks[chunk] = chunk
       self.start_map[chunk.start].append(chunk)
@@ -186,7 +181,16 @@ class ChunkDatabase:
     return np.random.choice(list(self._chunks.values()))
 
   def __repr__(self) -> str:
-    return f"ChunkDatabase({len(self._chunks)})"
+    repr = [
+      "ChunkDatabase Information",
+      f"Data Shape: {self.data.shape}",
+      f"Threshold: {self.threshold}",
+      f"Max Chunk Length: {self.max_chunk_length}",
+      f"Number of Chunks: {len(self._chunks)}",
+      "Number of Chunks by Length",
+      *[f"{k}: {len(v)}" for k, v in self.length_map.items()],
+    ]
+    return "\n".join(repr)
 
 
 __all__ = ["ChunkDatabase"]

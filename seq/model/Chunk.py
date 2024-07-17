@@ -14,7 +14,7 @@ class Chunk:
     self.subsequence = subsequence
     self.start = start
     self.end = end
-    self.seq_indices: list[int] = seq_indices
+    self.seq_indices: set[int] = seq_indices
 
   @property
   def width(self) -> int:
@@ -47,8 +47,8 @@ class Chunk:
   def __hash__(self):
     return hash((self.start, self.end, tuple(self.subsequence)))
 
-  def add_index(self, index: int):
-    self.seq_indices.append(index)
+  def append(self, index: int):
+    self.seq_indices.add(index)
 
   def __repr__(self) -> str:
     return f"Chunk({self.subsequence}, {self.start}, {self.end}, #{len(self.seq_indices)})"
