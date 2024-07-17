@@ -45,7 +45,7 @@ class Chunk:
     )
 
   def __hash__(self):
-    return hash((self.start, self.end, tuple(self.subsequence)))
+    return hash((self.start, self.end, self.subsequence.tobytes()))
 
   def append(self, index: int):
     self.seq_indices.add(index)

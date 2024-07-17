@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from functools import cached_property
 from typing import Hashable, Literal
 
 import numpy as np
@@ -9,24 +10,42 @@ from tqdm import tqdm
 from .Chunk import Chunk
 
 
+def key(
+  start: int = None,
+  end: int = None,
+  sequence: tuple | None = None,
+):
+  key = ""
+
+  if start is not None:
+    key += f"s{start}"
+  if end is not None:
+    key += f"e{end}"
+  if sequence is not None:
+    key += f"q{sequence}"
+
+  if key == "":
+    raise ValueError("No key provided")
+
+  return key
+
+
 class ChunkDatabase:
   data: np.ndarray
   n_sequences: int
   seq_length: int
-  threshold: float
+  threshold: float | int
   max_chunk_length: int
-  min_n_chunks: int
+  min_frequency: int
 
   _chunks: dict[Hashable, Chunk]
-  start_map: dict[int, list[Chunk]]
-  end_map: dict[int, list[Chunk]]
-  continue_map: dict[tuple[str, str], list[Chunk]]
-  seq_map: dict[tuple, list[Chunk]]
+  length_map: dict[int, list[Chunk]]
+  d: dict[Hashable, list[Chunk]]
 
   def __init__(
     self,
     data: np.ndarray,
-    threshold: int = 0.05,
+    threshold: int | float = 100,
     max_chunk_length: int | Literal["auto"] = 5,
   ) -> None:
     self.n_sequences, self.seq_length = data.shape
@@ -34,28 +53,28 @@ class ChunkDatabase:
     self.max_chunk_length = (
       max_chunk_length if max_chunk_length != "auto" else self.seq_length
     )
-    self.min_n_chunks = int(self.n_sequences * self.threshold)
+    self.min_frequency = (
+      self.threshold
+      if isinstance(threshold, int)
+      else int(self.n_sequences * threshold)
+    )
     self.data = data
 
     self._chunks = defaultdict(Chunk)
-    self.start_map = defaultdict(list)
-    self.end_map = defaultdict(list)
-    self.start_end_map = defaultdict(list)
-    self.continue_map = defaultdict(list)
-    self.seq_map = defaultdict(list)
     self.length_map = defaultdict(list)
+
+    self.d = defaultdict(list)
 
     self.find_chunks()
 
   def __getitem__(self, key: Hashable) -> Chunk | None:
     return self._chunks.get(key, None)
 
-  @property
+  @cached_property
   def chunks(self):
     return sorted(
       list(self._chunks.values()),
-      key=lambda x: (len(x.subsequence) * self.n_sequences * self.seq_length)
-      + len(x.seq_indices),
+      key=lambda x: (x.width, x.height),
       reverse=True,
     )
 
@@ -65,118 +84,137 @@ class ChunkDatabase:
     for chunk_length in tqdm(range(self.max_chunk_length, 0, -1)):
       chunk_view = np.lib.stride_tricks.sliding_window_view(
         data, (1, chunk_length)
-      ).reshape(
-        self.n_sequences, self.seq_length - chunk_length + 1, chunk_length
-      )
+      ).reshape(data.shape[0], -1, chunk_length)
+      org_chunk_view = chunk_view.copy()
+      hashes = np.apply_along_axis(lambda x: hash(tuple(x)), 2, chunk_view)
+      masks = np.all(chunk_view != 0, axis=2)
+      hashes_count = np.zeros(hashes.shape)
 
-      for i in range(chunk_view.shape[1]):
-        chunk_dict = defaultdict(list)
-        for seq_idx, chunk in enumerate(chunk_view[:, i]):
-          chunk_dict[tuple(chunk)].append(seq_idx)
+      for col in range(hashes.shape[1]):
+        _, inverse, counts = np.unique(
+          hashes[:, col], return_counts=True, return_inverse=True
+        )
+        hashes_count[:, col] = counts[inverse]
 
-        for chunk, seq_indices in chunk_dict.items():
-          chunk = np.array(chunk)
-          count = len(seq_indices)
+      hashes_count *= masks
 
-          if np.any(chunk == 0) or (
-            chunk_length > 1 and count < self.min_n_chunks
-          ):
-            continue
+      hashes_arg_sorted = np.argsort(-hashes_count, axis=1)
 
-          seq_indices = np.array(seq_indices)
-          data[seq_indices, i : i + chunk_length] = 0
-
-          self.add(
-            Chunk(
-              start=i,
-              end=i + chunk_length,
-              subsequence=chunk,
-              seq_indices=set(seq_indices),
+      min_freq = 1 if chunk_length == 1 else self.min_frequency
+      for row in range(hashes.shape[0]):
+        for col in hashes_arg_sorted[row]:
+          if hashes_count[row, col] >= min_freq:
+            data[row, col : col + chunk_length] = 0
+            self.add(
+              Chunk(
+                subsequence=org_chunk_view[row, col],
+                start=col,
+                end=col + chunk_length,
+                seq_indices=set([row]),
+              )
             )
-          )
+
+    if np.any(data != 0):
+      raise ValueError("Data not fully processed")
 
   def add(self, chunk: Chunk):
     if chunk in self._chunks:
       self._chunks[chunk].seq_indices.update(chunk.seq_indices)
-    else:
-      self._chunks[chunk] = chunk
-      self.start_map[chunk.start].append(chunk)
-      self.end_map[chunk.end].append(chunk)
-      self.start_end_map[(chunk.start, chunk.end)].append(chunk)
-      self.seq_map[tuple(chunk.subsequence)].append(chunk)
-      self.length_map[len(chunk.subsequence)].append(chunk)
-      for i in range(len(chunk.subsequence)):
-        if i > 1:
-          self.continue_map[
-            (f"{chunk.start}*", tuple(chunk.subsequence[:i]))
-          ].append(chunk)
-        if i < len(chunk.subsequence) - 2:
-          self.continue_map[
-            (f"*{chunk.end}", tuple(chunk.subsequence[i + 1 :]))
-          ].append(chunk)
+      return
+
+    self._chunks[chunk] = chunk
+
+    # length
+    self.length_map[len(chunk.subsequence)].append(chunk)
+    # start
+    self.d[key(start=chunk.start)].append(chunk)
+    # end
+    self.d[key(end=chunk.end)].append(chunk)
+    # start, end
+    self.d[key(start=chunk.start, end=chunk.end)].append(chunk)
+    # subsequence
+    self.d[key(sequence=chunk.subsequence)].append(chunk)
+
+    # self
+    self.d[
+      key(start=chunk.start, end=chunk.end, sequence=chunk.subsequence)
+    ].append(chunk)
+
+    # Continue Subsequence
+    for i in range(0, chunk.width):
+      self.d[key(start=chunk.start, sequence=chunk.subsequence[:-i])].append(
+        chunk
+      )
+      self.d[key(end=chunk.end, sequence=chunk.subsequence[i:])].append(chunk)
 
   def get_candidate(self, chunk: Chunk) -> list[Chunk]:
-    candidates = {
-      *self.get(start=chunk.start, sub_sequences=chunk.subsequence),
-      *self.get(end=chunk.end, sub_sequences=chunk.subsequence),
-    }
-    for i in range(1, len(chunk.subsequence) - 1):
-      left = self.get(
-        start=chunk.start + i,
-        end=chunk.end,
-        sub_sequences=chunk.subsequence[i:],
-      )
-      left_continue = self.get(
-        start=chunk.start + i, sub_sequences=chunk.subsequence[i:]
-      )
-      right = self.get(
-        start=chunk.start,
-        end=chunk.end - i,
-        sub_sequences=chunk.subsequence[:-i],
-      )
-      right_continue = self.get(
-        end=chunk.end - i, sub_sequences=chunk.subsequence[:-i]
-      )
-      candidates.update(set(left + left_continue + right + right_continue))
+    candidates: list[tuple[int, Chunk]] = []
 
-      if len(candidates) > 1:
-        break
+    # Continue Subsequence Candidate
+    for i in range(1, chunk.width):
+      candidates.extend(
+        [
+          (
+            chunk.width - i,
+            c,
+            key(start=chunk.start + i, sequence=chunk.subsequence[i:]),
+          )
+          for c in self.d[
+            key(start=chunk.start + i, sequence=chunk.subsequence[i:])
+          ]
+        ]
+      )
+      candidates.extend(
+        [
+          (
+            chunk.width - i,
+            c,
+            key(end=chunk.end - i, sequence=chunk.subsequence[:-i]),
+          )
+          for c in self.d[
+            key(end=chunk.end - i, sequence=chunk.subsequence[:-i])
+          ]
+        ]
+      )
 
-    return sorted(
-      list(candidates),
-      key=lambda x: len(x.subsequence) * self.n_sequences * self.seq_length
-      + len(x.seq_indices),
-      reverse=True,
-    )
-
-  def get(
-    self, start: int = -1, end: int = -1, sub_sequences=None
-  ) -> list[Chunk]:
-    if sub_sequences is None:
-      if start == -1 and end == -1:
-        raise ValueError("Either start, end or sub_sequences must be provided")
-      elif start == -1:
-        return self.end_map[end]
-      elif end == -1:
-        return self.start_map[start]
-      else:
-        return self.start_end_map[(start, end)]
-
-    else:
-      if start == -1 and end == -1:
-        return self.seq_map[tuple(sub_sequences)]
-      elif start == -1:
-        return self.continue_map[(f"*{end}", tuple(sub_sequences))]
-      elif end == -1:
-        return self.continue_map[(f"{start}*", tuple(sub_sequences))]
-      else:
-        c = self._chunks.get(
-          Chunk(
-            start=start, end=end, subsequence=sub_sequences, seq_indices=[]
-          ),
-          None,
+    # Sliding Window Subsequence Candidate
+    for window in range(1, chunk.width):
+      for i in range(0, chunk.width - window):
+        candidates.extend(
+          [
+            (
+              window,
+              c,
+              key(
+                start=chunk.start,
+                end=chunk.start + window,
+                sequence=chunk.subsequence[i : i + window],
+              ),
+            )
+            for c in self.d[
+              key(
+                start=chunk.start,
+                end=chunk.start + window,
+                sequence=chunk.subsequence[i : i + window],
+              )
+            ]
+          ]
         )
-        return [c] if c else []
+    return [
+      x[1]
+      for x in sorted(
+        candidates,
+        key=lambda x: (
+          x[0],
+          len(x[1].subsequence),
+          len(x[1].seq_indices),
+        ),
+        reverse=True,
+      )
+    ]
+
+  def get(self, start=None, end=None, sub_sequences=None) -> list[Chunk]:
+    return self.d[key(start=start, end=end, sequence=sub_sequences)]
 
   def get_random(self):
     return np.random.choice(list(self._chunks.values()))
