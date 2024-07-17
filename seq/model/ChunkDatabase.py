@@ -44,6 +44,7 @@ class ChunkDatabase:
     self.continue_map = defaultdict(list)
     self.seq_map = defaultdict(list)
     self.length_map = defaultdict(list)
+
     self.find_chunks()
 
   def __getitem__(self, key: Hashable) -> Chunk | None:

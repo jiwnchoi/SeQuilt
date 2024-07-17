@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import deque
+from functools import cached_property
 
 import numpy as np
 
@@ -32,57 +33,60 @@ class Cluster:
   def right(self):
     return self.path[-1]
 
-  @property
+  @cached_property
   def height(self):
     return sum([chunk.height for chunk in self.path])
 
-  @property
+  @cached_property
   def start(self):
     return min([chunk.start for chunk in self.path])
 
-  @property
+  @cached_property
   def end(self):
     return max([chunk.end for chunk in self.path])
 
-  @property
+  @cached_property
   def width(self):
     return self.end - self.start
 
-  @property
+  @cached_property
   def size(self):
     return sum([chunk.size for chunk in self.path])
 
-  @property
+  @cached_property
   def shape(self):
     return self.height, self.width
 
-  @property
+  @cached_property
   def sequlet(self):
     canvas = np.zeros(self.shape)
 
     current_index = 0
     for chunk in self.path:
       canvas[
-        current_index : current_index + chunk.height, chunk.start : chunk.end
+        current_index : current_index + chunk.height,
+        chunk.start - self.start : chunk.end - self.start,
       ] = chunk.subsequence
       current_index += chunk.height
     return canvas
 
-  def draw(self, canvas: np.ndarray, n_steps: int) -> np.ndarray | None:
-    if canvas.shape[1] != self.width:
-      raise ValueError("Width of subcanvas does not match width of cluster")
-
-    max_start = canvas.shape[0] - self.height + 1
+  def can_draw(self, canvas: np.ndarray) -> bool:
+    if canvas.shape != self.shape:
+      raise ValueError(
+        f"Canvas shape must match cluster shape: {canvas.shape} != {self.shape}"
+      )
     sequlet = self.sequlet
 
-    for i in range(0, max_start, n_steps):
-      subcanvas = canvas[i : i + self.height]
-      target = sequlet != 0
-      if np.all(subcanvas[target] == 0):
-        subcanvas[target] = sequlet[target]
-        return canvas
+    if np.all(canvas[sequlet != 0] == 0):
+      return True
+    return False
 
-    return None
+  def draw(self, canvas: np.ndarray) -> None:
+    if canvas.shape != self.shape:
+      raise ValueError("Canvas shape must match cluster shape")
+    sequlet = self.sequlet
+
+    canvas[sequlet != 0] = sequlet[sequlet != 0]
 
   def __repr__(self) -> str:
     return f"Cluster(shape: {self.shape}, size: {self.size})"
