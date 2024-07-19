@@ -78,17 +78,24 @@ class ChunkDatabase:
       reverse=True,
     )
 
+  def __iter__(self):
+    return self.chunks.__iter__()
+
+  def __next__(self):
+    return self.chunks.__next__()
+
+  def __len__(self):
+    return len(self._chunks)
+
   def find_chunks(self):
     data = self.data.copy()
 
-    for chunk_length in tqdm(range(self.max_chunk_length, 0, -1)):
+    for chunk_length in tqdm(range(self.max_chunk_length, 1, -1)):
       chunk_view = np.lib.stride_tricks.sliding_window_view(
         data, (1, chunk_length)
       ).squeeze(axis=2)
       org_chunk_view = chunk_view.copy()
       hashes = np.apply_along_axis(lambda x: hash(tuple(x)), 2, chunk_view)
-
-      mask = np.any(chunk_view == 0, axis=2)
 
       hashes_count = np.zeros(hashes.shape)
 
@@ -98,7 +105,7 @@ class ChunkDatabase:
         )
         hashes_count[:, col] = counts[inverse]
 
-      hashes_count[mask] = 0
+      hashes_count[np.any(chunk_view == 0, axis=2)] = 0
 
       hashes_arg_sorted = np.argsort(-hashes_count, axis=1)
 
@@ -106,9 +113,9 @@ class ChunkDatabase:
 
       for row in range(hashes.shape[0]):
         for col in hashes_arg_sorted[row]:
-          if hashes_count[row, col] >= min_freq:
-            if np.any(data[row, col : col + chunk_length] == 0):
-              continue
+          if hashes_count[row, col] >= min_freq and not np.any(
+            data[row, col : col + chunk_length] == 0
+          ):
             data[row, col : col + chunk_length] = 0
             self.add(
               Chunk(
@@ -118,9 +125,6 @@ class ChunkDatabase:
                 seq_indices=set([row]),
               )
             )
-
-    if np.any(data != 0):
-      raise ValueError("Data is not fully processed")
 
   def add(self, chunk: Chunk):
     if chunk in self._chunks:
