@@ -8,15 +8,16 @@ from nltk.corpus import stopwords
 from tokenizers import Encoding, Tokenizer
 from tqdm import tqdm
 
-from seq.model import TokenizedModel, TokenizerModel
+from seq.model import TokenizedModel
 
+from .BaseTokenizer import BaseTokenizer
 from .dna import DNATokenizer
 from .language import NLTKTokenizer
 
 
 def _encode_batch(
   text_batch: list[str],
-  tokenizer: TokenizerModel,
+  tokenizer: BaseTokenizer,
 ) -> list[TokenizedModel]:
   tokenized_batch = tokenizer.encode_batch(text_batch)
   return [
@@ -35,7 +36,7 @@ def _encode_batch(
 
 def _encode(
   text: str,
-  tokenizer: TokenizerModel,
+  tokenizer: BaseTokenizer,
 ) -> TokenizedModel:
   tokenized = tokenizer.encode(text)
   return (
@@ -122,7 +123,7 @@ def _process_dna(
 
 def get_ids(
   corpus: list[str],
-  tokenizer: TokenizerModel,
+  tokenizer: BaseTokenizer,
   max_tokens: int = 16,
   stopwords: list[str] = stopwords.words("english"),
 ) -> tuple[np.ndarray, list[np.ndarray]]:
@@ -165,7 +166,7 @@ def _tf_idf(doc_term_matrix: np.ndarray) -> np.ndarray:
 
 def get_tokenizer(
   type: Literal["language", "dna"] | str, *args, **kwargs
-) -> TokenizerModel | Tokenizer:
+) -> BaseTokenizer | Tokenizer:
   if type == "language":
     return NLTKTokenizer(*args, **kwargs)
   if type == "dna":
@@ -176,7 +177,7 @@ def get_tokenizer(
 
 def get_featured_ids(
   ids: list[np.ndarray],
-  tokenizer: TokenizerModel,
+  tokenizer: BaseTokenizer,
   method: Literal["tf-idf", "count"] = "count",
   n_features: int = 10,
 ) -> np.ndarray:

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from seq.model import TokenizerModel
+from ..BaseTokenizer import BaseTokenizer
 
 
-class DNATokenizer(TokenizerModel):
+class DNATokenizer(BaseTokenizer):
   def __init__(self, k: int = 3):
     super().__init__()
 
