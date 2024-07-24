@@ -33,9 +33,13 @@ build_cmd = "build"
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
+src = ["seq", "stubs"]
+extend-include = ["*.pyi"]
+
 exclude = [
     ".bzr",
     ".direnv",
+    "widget",
     ".eggs",
     ".git",
     ".git-rewrite",
@@ -72,7 +76,7 @@ target-version = "py39"
 [tool.ruff.lint]
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
 select = ["E4", "E7", "E9", "F", "I", "FA"]
-ignore = []
+ignore = ["F403"]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
@@ -99,10 +103,14 @@ line-ending = "auto"
 include = ["src/**/*.py"]
 exclude = ["**/node_modules",
     "**/__pycache__",
-    "src/experimental",
-    "src/typestubs"
+    "seq/experimental",
+    "seq/typestubs",
+    "seq/typings",
 ]
 reportMissingImports = true
 reportMissingTypeStubs = false
 
 pythonVersion = "3.9"
+
+[tool.setuptools.package-data]
+"*" = ["py.typed", "*.pyi"]

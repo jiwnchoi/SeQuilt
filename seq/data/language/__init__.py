@@ -1,5 +1,5 @@
-from .tokenizer import NLTKTokenizer
+from .tokenizer import LanguageTokenizer
 
 __all__ = [
-  "NLTKTokenizer",
+  "LanguageTokenizer",
 ]

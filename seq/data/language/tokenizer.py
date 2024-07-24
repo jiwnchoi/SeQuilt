@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from nltk.tokenize import word_tokenize
 
-from seq.model import TokenizerModel
+from ..BaseTokenizer import BaseTokenizer
 
 
-class NLTKTokenizer(TokenizerModel):
+class LanguageTokenizer(BaseTokenizer):
   def __init__(self):
     super().__init__()
 
@@ -56,4 +56,4 @@ class NLTKTokenizer(TokenizerModel):
     return self._id_to_token[id]
 
 
-__all__ = ["NLTKTokenizer"]
+__all__ = ["LanguageTokenizer"]

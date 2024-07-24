@@ -5,7 +5,7 @@ from typing import TypeVar
 T = TypeVar("T")
 
 
-class TokenizerModel:
+class BaseTokenizer:
   def __init__(self):
     self._token_to_id = {"[MASK]": 0}
     self._id_to_token = {0: "[MASK]"}
@@ -39,4 +39,4 @@ class TokenizerModel:
     return self._id_to_token[id]
 
 
-__all__ = ["TokenizerModel"]
+__all__ = ["BaseTokenizer"]
