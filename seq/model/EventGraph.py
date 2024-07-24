@@ -1,22 +1,31 @@
-from typing import TYPE_CHECKING, Iterable
+from __future__ import annotations
+
+from functools import cached_property
+from typing import TYPE_CHECKING, Any, Iterable, Iterator
 
 import networkx as nx
+import numpy as np
 
 if TYPE_CHECKING:
   from .Event import Event
 
 
 class EventGraph(nx.Graph):
-  def __init__(self):
+  def __init__(self, data: np.ndarray | list[list]):
     super().__init__()
+    if not isinstance(data, (np.ndarray, list)):
+      raise ValueError("Data must be a 2-dimensional array or list")
 
-  @property
-  def events(self) -> Iterable["Event"]:
+    events = self._count_events(data)
+
+    if len(events) == 0:
+      raise ValueError("No events found in the data")
+
+    self.add_events_from(events)
+
+  @cached_property
+  def events(self) -> Iterator["Event"]:
     return self.nodes
-
-  def _add_node(self, node_for_adding: "Event", **attr):
-    super().add_node(node_for_adding, **attr)
-    self._make_complete(node_for_adding)
 
   def add_event(self, event: "Event", **attr):
     self._add_node(event, **attr)
@@ -24,6 +33,40 @@ class EventGraph(nx.Graph):
   def add_events_from(self, events: Iterable["Event"], **attr):
     for event in events:
       self.add_event(event, **attr)
+
+  def _count_events(self, data: np.ndarray | list[list[Any]]) -> list["Event"]:
+    if not isinstance(data, np.ndarray):
+      try:
+        data = np.array(data)
+      except ValueError:
+        raise ValueError(
+          "Sequence data must be a 2-dimensional array and the values must be hashable"
+        )
+
+    if len(data.shape) != 2:
+      raise ValueError("Sequence data must be 2-dimensional array")
+
+    events = []
+
+    for position in range(data.shape[1]):
+      unique = np.unique(data[:, position])
+
+      events.extend(
+        [
+          Event(
+            value,
+            position,
+            np.argwhere(data[:, position] == value).flatten().tolist(),
+          )
+          for value in unique
+        ]
+      )
+
+    return events
+
+  def _add_node(self, node_for_adding: "Event", **attr):
+    super().add_node(node_for_adding, **attr)
+    self._make_complete(node_for_adding)
 
   def _make_complete(self, new_node: "Event"):
     for node in self.events:

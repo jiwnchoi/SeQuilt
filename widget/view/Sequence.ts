@@ -18,7 +18,7 @@ class Sequence {
 	_render(model: AnyModel<IWidgetModel>) {
 		const rects = model.get("rects");
 		const labels = model.get("labels");
-		const sequenceLength = model.get("n_length");
+		// const sequenceLength = model.get("n_length");
 		const numSequences = model.get("n_sequences");
 		const grid = model.get("grid");
 

@@ -1,10 +1,12 @@
 from typing import Any, Iterable
 
+from seq.utils import jaccard_similarity
+
 
 class Event:
-  def __init__(self, value: Any, position: int, indices: Iterable) -> None:
+  def __init__(self, value: Any, position: int, occurences: Iterable) -> None:
     self.position = position
-    self.indices = set(indices)
+    self.occurences = set(occurences)
     self.value = value
 
   def __hash__(self) -> int:
@@ -14,10 +16,10 @@ class Event:
     return self.position == other.position and self.value == other.value
 
   def __repr__(self) -> str:
-    return f"Token(Position={self.position}, Value={self.value}, #Indices={len(self.indices)})"
+    return f"Token(Position={self.position}, Value={self.value}, # Occurences={len(self.occurences)})"
 
   def __str__(self) -> str:
     return self.__repr__()
 
   def diff(self, e: "Event") -> int:
-    return len(self.indices.intersection(e.indices))
+    return jaccard_similarity(self.occurences, e.occurences)
