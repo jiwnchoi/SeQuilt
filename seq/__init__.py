@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.metadata
+import json
 import os
 import pathlib
 
@@ -9,8 +10,6 @@ import traitlets
 
 from .model import LabelModel, RectModel, WidgetModel
 
-dev = os.environ.get("ANYWIDGET_DEV") == "1"
-
 try:
   __version__ = importlib.metadata.version("seq")
 except importlib.metadata.PackageNotFoundError:
@@ -18,12 +17,6 @@ except importlib.metadata.PackageNotFoundError:
 
 
 class Widget(anywidget.AnyWidget, WidgetModel):
-  _esm = (
-    pathlib.Path(__file__).parent / "static" / "widget.js"
-    if not dev
-    else "http://localhost:5173/widget/widget.ts?anywidget"
-  )
-
   labels = traitlets.List([]).tag(sync=True)
   sequlets = traitlets.List([]).tag(sync=True)
 
@@ -43,6 +36,14 @@ class Widget(anywidget.AnyWidget, WidgetModel):
     **kwargs,
   ) -> None:
     super().__init__(*args, **kwargs)
+
+    if os.getenv("ANYWIDGET_DEV") == "1":
+      vite_config = json.load(
+        open(pathlib.Path(__file__).parent.parent / "vite.config.json")
+      )
+      self._esm = f"http://localhost:{vite_config['server']['port']}/widget/widget.ts?anywidget"
+    else:
+      self._esm = pathlib.Path(__file__).parent / "static" / "widget.js"
 
     self.sequlets = sequlets
     self.labels = labels

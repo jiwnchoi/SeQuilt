@@ -1,25 +1,8 @@
 import anywidget from "@anywidget/vite";
-// vite.config.js
-import { defineConfig } from "vite";
+import { UserConfig, defineConfig } from "vite";
+import config from "./vite.config.json";
 
 export default defineConfig({
+	...(config as Partial<UserConfig>),
 	plugins: [anywidget()],
-	build: {
-		outDir: "seq/static",
-		rollupOptions: {
-			output: {
-				entryFileNames: "widget.js",
-				assetFileNames: "widget.[ext]",
-			},
-		},
-		lib: {
-			entry: "widget/widget.ts",
-			formats: ["es"],
-		},
-	},
-	resolve: {
-		alias: {
-			"@/": "/widget/",
-		},
-	},
 });
