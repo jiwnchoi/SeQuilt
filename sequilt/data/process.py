@@ -12,7 +12,7 @@ from sequilt.model import TokenizedModel
 
 from .BaseTokenizer import BaseTokenizer
 from .dna import DNATokenizer
-from .language import NLTKTokenizer
+from .language import LanguageTokenizer
 
 
 def _encode_batch(
@@ -94,7 +94,7 @@ def _process_dna(
 
 def _process_text(
   text: str,
-  tokenizer: NLTKTokenizer,
+  tokenizer: LanguageTokenizer,
   max_tokens: int = 16,
   stopwords: list[str] = stopwords.words("english"),
 ) -> TokenizedModel:
@@ -133,7 +133,7 @@ def get_ids(
   for text in tqdm(corpus):
     if isinstance(tokenizer, DNATokenizer) == "dna":
       tokenized = _process_dna(text, tokenizer, max_tokens)
-    if isinstance(tokenizer, NLTKTokenizer) == "language":
+    if isinstance(tokenizer, LanguageTokenizer) == "language":
       tokenized = _process_text(text, tokenizer, max_tokens, stopwords)
     else:
       encoded = _encode(text, tokenizer)
@@ -168,7 +168,7 @@ def get_tokenizer(
   type: Literal["language", "dna"] | str, *args, **kwargs
 ) -> BaseTokenizer | Tokenizer:
   if type == "language":
-    return NLTKTokenizer(*args, **kwargs)
+    return LanguageTokenizer(*args, **kwargs)
   if type == "dna":
     return DNATokenizer(*args, **kwargs)
   else:
