@@ -33,6 +33,6 @@
 			"vitest --globals run",
 			"biome check --write"
 		],
-		"*.{py,pyi,pyc}": ["hatch fmt"]
+		"*.{py,pyi,pyc}": ["hatch run ruff check --fix", "hatch run ruff format"]
 	}
 }

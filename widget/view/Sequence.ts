@@ -1,4 +1,5 @@
-import type { IRectModel, IWidgetModel } from "@/model";
+import type { IWidget } from "@/model";
+import { getOutline } from "@/utils";
 import { AnyModel } from "@anywidget/types";
 import * as d3 from "d3";
 // import { html, svg } from "lit-html";
@@ -6,73 +7,89 @@ import * as d3 from "d3";
 
 class Sequence {
 	svg: d3.Selection<SVGSVGElement, undefined, null, undefined>;
-	width: number;
-	height: number;
+	model: AnyModel<IWidget>;
 
-	constructor(width: number, height: number) {
-		this.svg = d3.create("svg").attr("viewBox", [0, 0, width, height]);
-		this.width = width;
-		this.height = height;
+	constructor(model: AnyModel<IWidget>) {
+		this.model = model;
+		this.svg = d3
+			.create("svg")
+			.attr(
+				"viewBox",
+				[0, 0, model.get("width"), model.get("height")].join(" "),
+			);
 	}
 
-	_render(model: AnyModel<IWidgetModel>) {
-		const rects = model.get("rects");
-		const labels = model.get("labels");
-		// const sequenceLength = model.get("n_length");
-		const numSequences = model.get("n_sequences");
-		const grid = model.get("grid");
+	_render() {
+		const sequlets = this.model.get("sequlets");
+		const labels = this.model.get("labels");
 
-		if (rects.length === 0 || labels.length === 0) {
+		if (sequlets.length === 0 || labels.length === 0) {
 			return;
 		}
 
-		const showColumns = [...new Set(rects.map((rect) => rect.x))];
+		const x = d3
+			.scaleLinear([0, this.model.get("width")])
+			.domain([0, this.model.get("canvasWidth")]);
 
-		function changeColumn(rect: IRectModel) {
-			const column = showColumns.indexOf(rect.x);
-			return { ...rect, x: column };
-		}
-
-		const x = d3.scaleLinear([0, this.width]).domain([0, showColumns.length]);
-		const y = d3.scaleLinear([0, this.height]).domain([0, numSequences]);
+		const y = d3
+			.scaleLinear([0, this.model.get("height")])
+			.domain([0, this.model.get("canvasHeight")]);
 
 		const color = d3
 			.scaleOrdinal(d3.schemeCategory10)
-			.domain(labels.map((label) => label.id.toString()));
+			.domain(labels.map((label) => label.value.toString()));
 
-		this.svg
+		// Sequlet Grouping
+		const sequletGroups = this.svg
+			.selectAll("g")
+			.data(sequlets)
+			.join("g")
+			.attr("class", (d) => `sequlet-${d.id}`);
+
+		// Draw Rects
+		// 추후에 Gradient로 변경 가능
+		sequletGroups
 			.selectAll("rect")
-			.data(rects.map(changeColumn))
+			.data((d) => d.rects)
 			.join("rect")
-			.attr("fill", (d: IRectModel) => color(d.id.toString()))
-			// .transition() Column으로 Groupby 한다음에 Column 별로 Transition 적용되게 변경
+			.attr("fill", (d) => color(d.value.toString()))
 			.attr("x", (d) => x(d.x))
-			.attr("y", (d) => y(d.y_start))
-			.attr("width", x(1) - x(0))
-			.attr("height", (d) => y(d.y_end + 1) - y(d.y_start));
+			.attr("y", (d) => y(d.y))
+			.attr("width", (d) => x(d.width))
+			.attr("height", (d) => y(d.height));
 
-		if (grid) {
+		// Draw Paths
+		sequletGroups
+			.selectAll("path")
+			.data((d) => getOutline(d.rects))
+			.join("path")
+			.attr("d", (d) => d)
+			.attr("fill", "none")
+			.attr("stroke", "black")
+			.attr("stroke-width", 0.3);
+
+		if (this.model.get("grid")) {
 			// Grid lines for x-axis
 			this.svg
 				.selectAll("line.verticalGrid")
-				.data(d3.range(0, showColumns.length + 1))
+				.data(d3.range(0, this.model.get("canvasWidth") + 1))
 				.join("line")
 				.attr("class", "verticalGrid")
 				.attr("x1", (d) => x(d))
 				.attr("x2", (d) => x(d))
 				.attr("y1", y(0))
-				.attr("y2", y(numSequences))
+				.attr("y2", y(this.model.get("canvasHeight")))
 				.attr("stroke", "black")
 				.attr("stroke-width", 0.2);
 
 			// Grid lines for y-axis
 			this.svg
 				.selectAll("line.horizontalGrid")
-				.data(d3.range(0, numSequences + 1))
+				.data(d3.range(0, this.model.get("canvasHeight") + 1))
 				.join("line")
 				.attr("class", "horizontalGrid")
 				.attr("x1", x(0))
-				.attr("x2", x(showColumns.length))
+				.attr("x2", x(this.model.get("canvasWidth")))
 				.attr("y1", (d) => y(d))
 				.attr("y2", (d) => y(d + 1))
 				.attr("stroke", "black")
@@ -82,8 +99,8 @@ class Sequence {
 			this.svg.selectAll("line.horizontalGrid").remove();
 		}
 	}
-	render(model: AnyModel<IWidgetModel>) {
-		this._render(model);
+	render() {
+		this._render();
 		return this.svg.node();
 	}
 }

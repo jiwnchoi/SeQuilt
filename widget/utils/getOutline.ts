@@ -1,10 +1,10 @@
-import { Point, Rect } from "@/model";
+import { IPoint, IRect } from "@/model";
 
-function getOutlinePoints(rects: Rect[]): Point[] {
+function getOutlinePoints(rects: IRect[]): IPoint[] {
 	const processedSet = new Set<string>();
 	const duplicateSet = new Set<string>();
 
-	const points: Point[] = rects.flatMap((rect) => [
+	const points: IPoint[] = rects.flatMap((rect) => [
 		{ x: rect.x, y: rect.y, type: "top-left" },
 		{ x: rect.x + rect.width, y: rect.y, type: "top-right" },
 		{ x: rect.x, y: rect.y + rect.height, type: "bottom-left" },
@@ -26,7 +26,7 @@ function getOutlinePoints(rects: Rect[]): Point[] {
 		.sort((a, b) => (a.x === b.x ? a.y - b.y : a.x - b.x));
 }
 
-function _getNextPoint(currentPoint: Point, points: Point[]) {
+function _getNextPoint(currentPoint: IPoint, points: IPoint[]) {
 	if (currentPoint.type == "top-left") {
 		return points.find((point) => point.y === currentPoint.y);
 	} else if (currentPoint.type == "top-right") {
@@ -34,18 +34,18 @@ function _getNextPoint(currentPoint: Point, points: Point[]) {
 	} else if (currentPoint.type == "bottom-right") {
 		return points.reduceRight(
 			(acc, point) => (point.y === currentPoint.y ? point : acc),
-			{} as Point,
+			{} as IPoint,
 		);
 	} else if (currentPoint.type == "bottom-left") {
 		return points.reduceRight(
 			(acc, point) => (point.x === currentPoint.x ? point : acc),
-			{} as Point,
+			{} as IPoint,
 		);
 	}
 	return undefined;
 }
 
-function getOutline(rects: Rect[]): string {
+function getOutline(rects: IRect[]): string {
 	let points = getOutlinePoints(rects);
 	const initialPoint = points.shift();
 	if (!initialPoint) return "";

@@ -1,7 +1,7 @@
-import { Rect } from "@/model";
+import { IRect } from "@/model";
 import { getOutline, getOutlinePoints } from "./getOutline";
 
-const dummyRects: Rect[] = [
+const dummyRects: IRect[] = [
 	{
 		x: 0,
 		y: 0,

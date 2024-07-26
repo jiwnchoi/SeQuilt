@@ -1,4 +1,4 @@
-import type { ILabelModel } from "@/model";
+import type { ILabel } from "@/model";
 import { schemeCategory10 } from "d3";
 import { html } from "lit-html";
 import { repeat } from "lit-html/directives/repeat.js";
@@ -32,7 +32,7 @@ class Legend {
 		this.container = document.createElement("div");
 	}
 
-	render(labels: ILabelModel[]) {
+	render(labels: ILabel[]) {
 		const colorScale = schemeCategory10;
 		const size = 10;
 		return html`
@@ -43,7 +43,7 @@ class Legend {
 					(label, index) => html`
           <li style=${styleMap(liStyle)}>
             <div style="${styleMap(spanStyle(size, colorScale[index]))}"></div>
-            ${label.label}
+            ${label.name}
           </li>
         `,
 				)}
