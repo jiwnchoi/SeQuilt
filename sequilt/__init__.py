@@ -11,12 +11,12 @@ import traitlets
 from .model import LabelModel, SequletModel, WidgetModel
 
 try:
-  __version__ = importlib.metadata.version("seqplat")
+  __version__ = importlib.metadata.version("sequilt")
 except importlib.metadata.PackageNotFoundError:
   __version__ = "unknown"
 
 
-class Widget(anywidget.AnyWidget, WidgetModel):
+class Sequilt(anywidget.AnyWidget, WidgetModel):
   labels = traitlets.List([]).tag(sync=True)
   sequlets = traitlets.List([]).tag(sync=True)
 

@@ -1,4 +1,4 @@
-from seqplat.model import LabelModel, RectModel, SequletModel
+from sequilt.model import LabelModel, RectModel, SequletModel
 
 dummy_sequlets = [
   SequletModel(

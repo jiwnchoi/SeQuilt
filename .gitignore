@@ -7,4 +7,4 @@ dist
 __pycache__
 .ipynb_checkpoints
 
-seqplat/static
+sequilt/static

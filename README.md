@@ -1,4 +1,4 @@
-# SeqPlat
+# Sequilt
 
 ## Development
 
