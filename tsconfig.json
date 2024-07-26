@@ -18,6 +18,7 @@
 		"baseUrl": "./",
 		"paths": {
 			"@/*": ["widget/*"]
-		}
+		},
+		"types": ["vitest/globals"]
 	}
 }

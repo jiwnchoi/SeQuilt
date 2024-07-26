@@ -5,8 +5,6 @@ import os
 import pathlib
 
 import anywidget
-import numpy as np
-import traitlets
 
 dev = os.environ.get("ANYWIDGET_DEV") == "1"
 
@@ -25,16 +23,16 @@ class Widget(anywidget.AnyWidget):
   # _css = (
   #   pathlib.Path(__file__).parent / "static" / "widget.css" if not dev else None
   # )
-  rects = traitlets.List([]).tag(sync=True)
-  labels = traitlets.List([]).tag(sync=True)
-  n_sequences = traitlets.Int(0).tag(sync=True)
-  n_length = traitlets.Int(0).tag(sync=True)
+  # rects = traitlets.List([]).tag(sync=True)
+  # labels = traitlets.List([]).tag(sync=True)
+  # n_sequences = traitlets.Int(0).tag(sync=True)
+  # n_length = traitlets.Int(0).tag(sync=True)
 
-  width = traitlets.Int(800).tag(sync=True)
-  height = traitlets.Int(600).tag(sync=True)
+  # width = traitlets.Int(800).tag(sync=True)
+  # height = traitlets.Int(600).tag(sync=True)
 
-  grid = traitlets.Bool(False).tag(sync=True)
-  sequences: np.ndarray
+  # grid = traitlets.Bool(False).tag(sync=True)
+  # sequences: np.ndarray
 
   # def __init__(
   #   self,

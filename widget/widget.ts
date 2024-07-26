@@ -7,27 +7,28 @@ function renderWidget({ model, el }: RenderProps<IWidgetModel>) {
 	const widget = document.createElement("div");
 	widget.id = "widget";
 
-	const width = model.get("width");
-	const height = model.get("height");
+	// const width = model.get("width");
+	// const height = model.get("height");
 
-	const sequenceView = new Sequence(width, height);
-	const legendView = new Legend();
+	// const sequenceView = new Sequence(width, height);
+	// const legendView = new Legend();
 
-	model.on("change:rects", () => {
-		sequenceView._render(model);
-	});
-	model.on("change:grid", () => {
-		sequenceView._render(model);
-	});
+	// model.on("change:rects", () => {
+	// 	sequenceView._render(model);
+	// });
+	// model.on("change:grid", () => {
+	// 	sequenceView._render(model);
+	// });
 
-	render(
-		html`
-        <div id="sequences-view" style="background-color: transparent;">
-          ${legendView.render(model.get("labels"))}
-          ${sequenceView.render(model)}
-        </div>`,
-		widget,
-	);
+	// render(
+	// 	html`
+	//       <div id="sequences-view" style="background-color: transparent;">
+	//         ${legendView.render(model.get("labels"))}
+	//         ${sequenceView.render(model)}
+	//       </div>`,
+	// 	widget,
+	// );
+	render(html`<div><svg></svg></div>`, widget);
 	el.appendChild(widget);
 }
 

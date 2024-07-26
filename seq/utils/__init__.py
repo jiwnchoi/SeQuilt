@@ -1,3 +1,3 @@
-from .sets import jaccard_similarity
+from .sets import jaccard_similarity_mod
 
-__all__ = ["jaccard_similarity"]
+__all__ = ["jaccard_similarity_mod"]

@@ -1,6 +1,6 @@
 from typing import Any, Iterable
 
-from seq.utils import jaccard_similarity
+from seq.utils import jaccard_similarity_mod
 
 
 class Event:
@@ -16,10 +16,13 @@ class Event:
     return self.position == other.position and self.value == other.value
 
   def __repr__(self) -> str:
-    return f"Token(Position={self.position}, Value={self.value}, # Occurences={len(self.occurences)})"
+    return f"Event(Position={self.position}, Value={self.value}, # Occurences={len(self.occurences)})"
 
   def __str__(self) -> str:
     return self.__repr__()
 
-  def diff(self, e: "Event") -> int:
-    return jaccard_similarity(self.occurences, e.occurences)
+  def diff(self, e: "Event") -> tuple[int, float]:
+    return (
+      abs(self.position - e.position),
+      jaccard_similarity_mod(self.occurences, e.occurences),
+    )

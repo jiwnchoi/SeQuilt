@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, Iterable, Iterator
+from typing import Any, Iterable, Iterator
 
 import networkx as nx
 import numpy as np
 
-if TYPE_CHECKING:
-  from .Event import Event
+from .Event import Event
 
 
 class EventGraph(nx.Graph):
@@ -73,6 +72,8 @@ class EventGraph(nx.Graph):
       if node != new_node and node.position != new_node.position:
         weight = new_node.diff(node)
         super().add_edge(new_node, node, weight=weight)
+
+  # Override to disable networkx.Graph methods
 
   def add_edge(self, **attr):
     raise NotImplementedError(

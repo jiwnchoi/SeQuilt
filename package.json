@@ -9,7 +9,8 @@
 		"format": "biome format --write .",
 		"check": "biome check --write .",
 		"prepare": "husky",
-		"lint-staged": "lint-staged"
+		"lint-staged": "lint-staged",
+		"test": "vitest --globals run"
 	},
 	"devDependencies": {
 		"@anywidget/types": "^0.1.9",
@@ -20,14 +21,18 @@
 		"husky": "^9.0.11",
 		"lint-staged": "^15.2.7",
 		"typescript": "^5.4.5",
-		"vite": "^5.3.1"
+		"vite": "^5.3.1",
+		"vitest": "^2.0.4"
 	},
 	"dependencies": {
 		"d3": "^7.9.0",
 		"lit-html": "^3.1.4"
 	},
 	"lint-staged": {
-		"*.{js,ts,tsx,css,html,json}": ["biome check --write"],
+		"*.{js,ts,tsx,css,html,json}": [
+			"vitest --globals run",
+			"biome check --write"
+		],
 		"*.{py,pyi,pyc}": ["hatch fmt"]
 	}
 }
