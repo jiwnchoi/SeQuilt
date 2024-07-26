@@ -6,22 +6,35 @@ import { html, render } from "lit-html";
 
 function renderWidget({ model, el }: RenderProps<IWidget>) {
 	const widget = document.createElement("div");
-	widget.id = "widget";
 
-	const sequenceView = new Sequence(model.get("width"), model.get("height"));
+	const width = model.get("width");
+	const height = model.get("height");
+
+	const sequenceView = new Sequence(width, height);
 	const legendView = new Legend();
-	const sequlets = getRescaledSequlets(
-		model.get("sequlets"),
-		model.get("labels"),
-		model.get("width"),
-		model.get("height"),
-	);
+
+	model.on("change:labels", (_, labels) => {
+		legendView.render(labels);
+	});
+
+	model.on("change:sequlets", (_, sequlets) => {
+		sequenceView.render(
+			getRescaledSequlets(sequlets, model.get("labels"), width, height),
+		);
+	});
 
 	render(
 		html`
       ${legendView.render(model.get("labels"))}
       <div id="sequenceView" style="padding:10px;">
-        ${sequenceView.render(sequlets, model.get("labels"))}
+        ${sequenceView.render(
+					getRescaledSequlets(
+						model.get("sequlets"),
+						model.get("labels"),
+						width,
+						height,
+					),
+				)}
       </div>
     `,
 		widget,

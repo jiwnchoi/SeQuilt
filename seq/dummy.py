@@ -10,11 +10,19 @@ dummy_sequlets = [
     ],
   ),
   SequletModel(
-    id=0,
+    id=1,
     rects=[
       RectModel(value=3, x=3, y=100, width=1, height=200),
       RectModel(value=4, x=4, y=0, width=1, height=300),
-      RectModel(value=5, x=5, y=20, width=1, height=200),
+      RectModel(value=5, x=5, y=50, width=1, height=200),
+    ],
+  ),
+  SequletModel(
+    id=2,
+    rects=[
+      RectModel(value=6, x=2, y=450, width=1, height=200),
+      RectModel(value=7, x=3, y=350, width=1, height=300),
+      RectModel(value=8, x=4, y=350, width=1, height=200),
     ],
   ),
 ]
@@ -26,6 +34,9 @@ dummy_labels = [
   LabelModel(value=3, name="D"),
   LabelModel(value=4, name="E"),
   LabelModel(value=5, name="F"),
+  LabelModel(value=6, name="G"),
+  LabelModel(value=7, name="H"),
+  LabelModel(value=8, name="I"),
 ]
 
 __all__ = ["dummy_sequlets", "dummy_labels"]
