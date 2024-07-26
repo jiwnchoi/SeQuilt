@@ -8,7 +8,7 @@ import pathlib
 import anywidget
 import traitlets
 
-from .model import LabelModel, RectModel, WidgetModel
+from .model import LabelModel, SequletModel, WidgetModel
 
 try:
   __version__ = importlib.metadata.version("seq")
@@ -27,7 +27,7 @@ class Widget(anywidget.AnyWidget, WidgetModel):
 
   def __init__(
     self,
-    sequlets: list[list[RectModel]] = [],
+    sequlets: list[SequletModel] = [],
     labels: list[LabelModel] = [],
     width: int = 800,
     height: int = 600,
@@ -45,8 +45,8 @@ class Widget(anywidget.AnyWidget, WidgetModel):
     else:
       self._esm = pathlib.Path(__file__).parent / "static" / "widget.js"
 
-    self.sequlets = sequlets
-    self.labels = labels
+    self.sequlets = [sequlet.model_dump() for sequlet in sequlets]
+    self.labels = [label.model_dump() for label in labels]
     self.width = width
     self.height = height
     self.grid = grid

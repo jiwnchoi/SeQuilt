@@ -1,5 +1,28 @@
 import { IPoint, IRect } from "@/model";
 
+declare global {
+	interface Array<T> {
+		findRight(
+			predicate: (value: T, index: number, obj: T[]) => unknown,
+		): T | undefined;
+	}
+}
+
+Array.prototype.findRight = function <T>(
+	this: T[],
+	predicate: (value: T, index: number, obj: T[]) => unknown,
+): T | undefined {
+	return this.reduceRight(
+		(acc: T | undefined, current: T, index: number, array: T[]) => {
+			if (acc !== undefined) {
+				return acc;
+			}
+			return predicate(current, index, array) ? current : undefined;
+		},
+		undefined,
+	);
+};
+
 function getOutlinePoints(rects: IRect[]): IPoint[] {
 	const processedSet = new Set<string>();
 	const duplicateSet = new Set<string>();
@@ -28,19 +51,17 @@ function getOutlinePoints(rects: IRect[]): IPoint[] {
 
 function _getNextPoint(currentPoint: IPoint, points: IPoint[]) {
 	if (currentPoint.type == "top-left") {
-		return points.find((point) => point.y === currentPoint.y);
+		return points.find(
+			(point) => point.y === currentPoint.y && point.type === "top-right",
+		);
 	} else if (currentPoint.type == "top-right") {
 		return points.find((point) => point.x === currentPoint.x);
 	} else if (currentPoint.type == "bottom-right") {
-		return points.reduceRight(
-			(acc, point) => (point.y === currentPoint.y ? point : acc),
-			{} as IPoint,
+		return points.findRight(
+			(point) => point.y === currentPoint.y && point.type === "bottom-left",
 		);
 	} else if (currentPoint.type == "bottom-left") {
-		return points.reduceRight(
-			(acc, point) => (point.x === currentPoint.x ? point : acc),
-			{} as IPoint,
-		);
+		return points.findRight((point) => point.x === currentPoint.x);
 	}
 	return undefined;
 }
@@ -50,7 +71,7 @@ function getOutline(rects: IRect[]): string {
 	const initialPoint = points.shift();
 	if (!initialPoint) return "";
 
-	let path = `M${initialPoint.x} ${initialPoint.y}`;
+	let path = `M ${initialPoint.x} ${initialPoint.y}`;
 	let currentPoint = initialPoint;
 
 	while (points.length > 0) {
@@ -59,7 +80,8 @@ function getOutline(rects: IRect[]): string {
 		points = points.filter(
 			(point) => !(point.x === nextPoint.x && point.y === nextPoint.y),
 		);
-		path += ` L${nextPoint.x} ${nextPoint.y}`;
+
+		path += ` L ${nextPoint.x} ${nextPoint.y}`;
 		currentPoint = nextPoint;
 	}
 

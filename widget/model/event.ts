@@ -10,6 +10,7 @@ export interface IRect {
 	y: number;
 	width: number;
 	height: number;
+	color?: string;
 }
 
 export interface IPoint {

@@ -1,32 +1,34 @@
-from typing import TypedDict
+from typing import List, TypedDict
 
+import numpy as np
 import traitlets
-from numpy import ndarray
+from pydantic import BaseModel
 
 from .Event import Event
 from .EventGraph import EventGraph
 
 
-class RectModel(TypedDict):
+class RectModel(BaseModel):
+  value: int
   x: int
   y: int
   width: int
   height: int
 
 
-class LabelModel(TypedDict):
+class LabelModel(BaseModel):
   value: int
   name: str
 
 
 class TokenizedModel(TypedDict):
-  ids: ndarray
-  tokens: ndarray
+  ids: np.ndarray
+  tokens: np.ndarray
 
 
-class SequletModel(TypedDict):
+class SequletModel(BaseModel):
   id: int
-  rects: list[RectModel]
+  rects: List[RectModel]
 
 
 class WidgetModel:

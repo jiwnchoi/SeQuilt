@@ -10,7 +10,7 @@
 		"check": "biome check --write .",
 		"prepare": "husky",
 		"lint-staged": "lint-staged",
-		"test": "vitest --globals run"
+		"test": "vitest --globals"
 	},
 	"devDependencies": {
 		"@anywidget/types": "^0.1.9",

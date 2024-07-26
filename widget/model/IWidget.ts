@@ -8,9 +8,6 @@ interface IWidget {
 	height: number; // rendered height
 
 	grid: boolean;
-
-	canvasWidth: number; // canvas width (sequence length)
-	canvasHeight: number; // canvas height (compressed height)
 }
 
 export default IWidget;
