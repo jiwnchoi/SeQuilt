@@ -39,7 +39,7 @@ class Legend {
       <ul style=${styleMap(ulStyle)}>
         ${repeat(
 					labels,
-					(label) => `label-${label.id}`,
+					(label) => `label-${label.value}`,
 					(label, index) => html`
           <li style=${styleMap(liStyle)}>
             <div style="${styleMap(spanStyle(size, colorScale[index]))}"></div>

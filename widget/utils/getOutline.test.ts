@@ -3,12 +3,14 @@ import { getOutline, getOutlinePoints } from "./getOutline";
 
 const dummyRects: IRect[] = [
 	{
+		value: 1,
 		x: 0,
 		y: 0,
 		width: 100,
 		height: 100,
 	},
 	{
+		value: 2,
 		x: 100,
 		y: 0,
 		width: 100,
@@ -21,7 +23,9 @@ test("getOutlinePoint with empty rects", () => {
 });
 
 test("getOutlinePoint with one rect", () => {
-	expect(getOutlinePoints([{ x: 0, y: 0, width: 100, height: 100 }])).toEqual([
+	expect(
+		getOutlinePoints([{ x: 0, y: 0, width: 100, height: 100, value: 1 }]),
+	).toEqual([
 		{ x: 0, y: 0, type: "top-left" },
 		{ x: 0, y: 100, type: "bottom-left" },
 		{ x: 100, y: 0, type: "top-right" },
