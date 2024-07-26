@@ -1,6 +1,6 @@
 from typing import Any, Iterable
 
-from seq.utils import jaccard_similarity_mod
+from seqplat.utils import jaccard_similarity_mod
 
 
 class Event:

@@ -11,7 +11,7 @@ import traitlets
 from .model import LabelModel, SequletModel, WidgetModel
 
 try:
-  __version__ = importlib.metadata.version("seq")
+  __version__ = importlib.metadata.version("seqplat")
 except importlib.metadata.PackageNotFoundError:
   __version__ = "unknown"
 

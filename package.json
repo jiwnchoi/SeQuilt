@@ -1,6 +1,6 @@
 {
 	"type": "module",
-	"name": "seq",
+	"name": "seqplat",
 	"scripts": {
 		"dev": "concurrently --kill-others \"vite\" \"hatch run jupyter lab\"",
 		"build": "tsc && vite build",

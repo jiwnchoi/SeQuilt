@@ -8,7 +8,7 @@ from nltk.corpus import stopwords
 from tokenizers import Encoding, Tokenizer
 from tqdm import tqdm
 
-from seq.model import TokenizedModel
+from seqplat.model import TokenizedModel
 
 from .BaseTokenizer import BaseTokenizer
 from .dna import DNATokenizer
