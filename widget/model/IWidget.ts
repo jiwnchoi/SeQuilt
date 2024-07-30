@@ -1,13 +1,13 @@
-import { ILabel, ISequlet } from "./event";
+import type { ILabel, ISequlet } from "./event";
 
 interface IWidget {
-	labels: ILabel[];
-	sequlets: ISequlet[];
+  labels: ILabel[];
+  sequlets: ISequlet[];
 
-	width: number; // rendered width
-	height: number; // rendered height
+  width: number; // rendered width
+  height: number; // rendered height
 
-	grid: boolean;
+  grid: boolean;
 }
 
 export default IWidget;

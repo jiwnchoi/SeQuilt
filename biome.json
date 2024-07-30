@@ -1,19 +1,10 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
   "files": {
-    "include": ["**/*.{js,ts,jsx,tsx}"]
+    "ignore": ["./sequilt/**/*"]
   },
   "organizeImports": {
     "enabled": true
-  },
-  "formatter": {
-    "enabled": true,
-    "indentWidth": 2,
-    "indentStyle": "space",
-    "lineEnding": "lf",
-    "lineWidth": 100,
-    "attributePosition": "auto",
-    "formatWithErrors": true
   },
   "linter": {
     "enabled": true,
@@ -50,6 +41,15 @@
         "useHookAtTopLevel": "error"
       }
     }
+  },
+  "formatter": {
+    "enabled": true,
+    "indentWidth": 2,
+    "indentStyle": "space",
+    "lineEnding": "lf",
+    "lineWidth": 100,
+    "attributePosition": "auto",
+    "formatWithErrors": true
   },
   "javascript": {
     "formatter": {
