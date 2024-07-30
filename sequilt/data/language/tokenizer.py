@@ -24,9 +24,7 @@ class LanguageTokenizer(BaseTokenizer):
   def encode_batch(self, texts: list[str]) -> list[dict]:
     return [self.encode(text) for text in texts]
 
-  def decode(
-    self, tokens: list[str] | None = None, ids: list[int] | None = None
-  ) -> str:
+  def decode(self, tokens: list[str] | None = None, ids: list[int] | None = None) -> str:
     if tokens is None and ids is None:
       raise ValueError("Either tokens or ids should be provided")
 

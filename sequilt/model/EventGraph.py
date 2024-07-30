@@ -76,31 +76,19 @@ class EventGraph(nx.Graph):
   # Override to disable networkx.Graph methods
 
   def add_edge(self, **attr):
-    raise NotImplementedError(
-      f"Cannot manually add edges in {self.__class__.__name__}"
-    )
+    raise NotImplementedError(f"Cannot manually add edges in {self.__class__.__name__}")
 
   def add_edges_from(self, **attr):
-    raise NotImplementedError(
-      f"Cannot manually add edges in {self.__class__.__name__}"
-    )
+    raise NotImplementedError(f"Cannot manually add edges in {self.__class__.__name__}")
 
   def remove_edge(self):
-    raise NotImplementedError(
-      f"Cannot remove edges in {self.__class__.__name__}"
-    )
+    raise NotImplementedError(f"Cannot remove edges in {self.__class__.__name__}")
 
   def remove_edges_from(self):
-    raise NotImplementedError(
-      f"Cannot remove edges in {self.__class__.__name__}"
-    )
+    raise NotImplementedError(f"Cannot remove edges in {self.__class__.__name__}")
 
   def add_node(self, node_for_adding, **attr):
-    raise NotImplementedError(
-      f"Cannot manually add nodes in {self.__class__.__name__}"
-    )
+    raise NotImplementedError(f"Cannot manually add nodes in {self.__class__.__name__}")
 
   def add_nodes_from(self, nodes_for_adding, **attr):
-    raise NotImplementedError(
-      f"Cannot manually add nodes in {self.__class__.__name__}"
-    )
+    raise NotImplementedError(f"Cannot manually add nodes in {self.__class__.__name__}")

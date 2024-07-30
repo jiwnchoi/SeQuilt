@@ -158,9 +158,7 @@ def _get_doc_term_matrix(size: tuple[int, int], ids: np.ndarray) -> np.ndarray:
 
 def _tf_idf(doc_term_matrix: np.ndarray) -> np.ndarray:
   tf = doc_term_matrix / np.sum(doc_term_matrix, axis=1)[:, np.newaxis]
-  idf = np.log(
-    doc_term_matrix.shape[0] / (1 + np.sum(doc_term_matrix > 0, axis=0))
-  )
+  idf = np.log(doc_term_matrix.shape[0] / (1 + np.sum(doc_term_matrix > 0, axis=0)))
   return tf * idf
 
 

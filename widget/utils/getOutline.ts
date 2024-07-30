@@ -89,4 +89,5 @@ function getOutline(rects: IRect[]): string {
 	return path;
 }
 
-export { getOutlinePoints, getOutline };
+export { getOutline, getOutlinePoints };
+

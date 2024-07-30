@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 from .Event import Event
 from .EventGraph import EventGraph
+from .Sequlet import Sequlet
 
 
 class RectModel(BaseModel):
@@ -26,14 +27,13 @@ class TokenizedModel(TypedDict):
   tokens: np.ndarray
 
 
-class SequletModel(BaseModel):
-  id: int
+class SequletRectsModel(BaseModel):
   rects: List[RectModel]
 
 
 class WidgetModel:
   labels: traitlets.List[LabelModel]
-  sequlets: traitlets.List[SequletModel]
+  sequlets: traitlets.List[Sequlet]
 
   width: traitlets.Int
   height: traitlets.Int
@@ -48,8 +48,9 @@ __all__ = [
   "RectModel",
   "LabelModel",
   "TokenizedModel",
-  "SequletModel",
+  "SequletRectsModel",
   "WidgetModel",
   "Event",
   "EventGraph",
+  "Sequlet",
 ]

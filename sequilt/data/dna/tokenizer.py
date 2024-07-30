@@ -11,9 +11,7 @@ class DNATokenizer(BaseTokenizer):
 
   def encode(self, text: str) -> list[str]:
     # Split the text into k-mers. ignore remaining characters
-    tokens = [
-      text[i * self.k : (i + 1) * self.k] for i in range(len(text) // self.k)
-    ]
+    tokens = [text[i * self.k : (i + 1) * self.k] for i in range(len(text) // self.k)]
 
     for token in tokens:
       if token not in self._token_to_id:
@@ -28,9 +26,7 @@ class DNATokenizer(BaseTokenizer):
   def encode_batch(self, texts: list[str]) -> list[dict]:
     return [self.encode(text) for text in texts]
 
-  def decode(
-    self, tokens: list[str] | None = None, ids: list[int] | None = None
-  ) -> str:
+  def decode(self, tokens: list[str] | None = None, ids: list[int] | None = None) -> str:
     if tokens is None and ids is None:
       raise ValueError("Either tokens or ids should be provided")
 

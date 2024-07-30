@@ -15,7 +15,7 @@
 	"devDependencies": {
 		"@anywidget/types": "^0.1.9",
 		"@anywidget/vite": "^0.2.0",
-		"@biomejs/biome": "1.8.2",
+		"@biomejs/biome": "1.8.3",
 		"@types/d3": "^7.4.3",
 		"concurrently": "^8.2.2",
 		"esbuild": "^0.21.4",

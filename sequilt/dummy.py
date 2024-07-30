@@ -1,7 +1,7 @@
-from sequilt.model import LabelModel, RectModel, SequletModel
+from sequilt.model import LabelModel, RectModel, SequletRectsModel
 
 dummy_sequlets = [
-  SequletModel(
+  SequletRectsModel(
     id=0,
     rects=[
       RectModel(value=0, x=0, y=0, width=1, height=200),
@@ -9,7 +9,7 @@ dummy_sequlets = [
       RectModel(value=2, x=2, y=0, width=1, height=200),
     ],
   ),
-  SequletModel(
+  SequletRectsModel(
     id=1,
     rects=[
       RectModel(value=3, x=3, y=100, width=1, height=200),
@@ -17,7 +17,7 @@ dummy_sequlets = [
       RectModel(value=5, x=5, y=50, width=1, height=200),
     ],
   ),
-  SequletModel(
+  SequletRectsModel(
     id=2,
     rects=[
       RectModel(value=6, x=2, y=450, width=1, height=200),

@@ -1,7 +1,5 @@
 from typing import Any, Iterable
 
-from sequilt.utils import jaccard_similarity_mod
-
 
 class Event:
   def __init__(self, value: Any, position: int, occurences: Iterable) -> None:
@@ -16,13 +14,20 @@ class Event:
     return self.position == other.position and self.value == other.value
 
   def __repr__(self) -> str:
-    return f"Event(Position={self.position}, Value={self.value}, # Occurences={len(self.occurences)})"
+    return (
+      f"Event(Position={self.position}, Value={self.value}, # Occurences={len(self.occurences)})"
+    )
 
   def __str__(self) -> str:
     return self.__repr__()
 
   def diff(self, e: "Event") -> tuple[int, float]:
-    return (
-      abs(self.position - e.position),
-      jaccard_similarity_mod(self.occurences, e.occurences),
-    )
+    # return (
+    #   abs(self.position - e.position),
+    #   jaccard_similarity_mod(self.occurences, e.occurences),
+    # )
+    return len(self.occurences.intersection(e.occurences))
+
+  # @cached_property
+  # def is_sequlet(self) -> bool:
+  #   return len(self.occurences) > 1

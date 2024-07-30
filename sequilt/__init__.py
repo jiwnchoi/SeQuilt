@@ -8,7 +8,7 @@ import pathlib
 import anywidget
 import traitlets
 
-from .model import LabelModel, SequletModel, WidgetModel
+from .model import LabelModel, SequletRectsModel, WidgetModel
 
 try:
   __version__ = importlib.metadata.version("sequilt")
@@ -27,8 +27,8 @@ class Sequilt(anywidget.AnyWidget, WidgetModel):
 
   def __init__(
     self,
-    sequlets: list[SequletModel] = [],
-    labels: list[LabelModel] = [],
+    sequlets: list["SequletRectsModel"] = [],
+    labels: list["LabelModel"] = [],
     width: int = 800,
     height: int = 600,
     grid: bool = False,
@@ -38,9 +38,7 @@ class Sequilt(anywidget.AnyWidget, WidgetModel):
     super().__init__(*args, **kwargs)
 
     if os.getenv("ANYWIDGET_DEV") == "1":
-      vite_config = json.load(
-        open(pathlib.Path(__file__).parent.parent / "vite.config.json")
-      )
+      vite_config = json.load(open(pathlib.Path(__file__).parent.parent / "vite.config.json"))
       self._esm = f"http://localhost:{vite_config['server']['port']}/widget/widget.ts?anywidget"
     else:
       self._esm = pathlib.Path(__file__).parent / "static" / "widget.js"

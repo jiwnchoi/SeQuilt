@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import cached_property
 from typing import TYPE_CHECKING
 
@@ -13,9 +15,6 @@ class Sequlet:
   events: list["Event"]
   value_sequence: np.ndarray
 
-  left_occurences: list[set]
-  right_occurences: list[set]
-
   left_position: int
   right_position: int
 
@@ -25,8 +24,7 @@ class Sequlet:
     self.events = [event]
     self.value_sequence = np.array([event.value])
 
-    self.left_occurences = [self.events[0].occurences]
-    self.right_occurences = [self.events[0].occurences]
+    self.occurences: list[set]
 
     self.left_position = event.position
     self.right_position = event.position
@@ -67,9 +65,7 @@ class Sequlet:
     if event.position < self.right_position:
       raise ValueError("Event position is not appendable.")
 
-    intersects = [
-      event.occurences.intersection(e.occurences) for e in self.events
-    ]
+    intersects = [event.occurences.intersection(e.occurences) for e in self.events]
     intersect_sims = [jaccard_similarity_mod(i) for i in intersects]
     print(intersects, intersect_sims)
 
