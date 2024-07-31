@@ -57,7 +57,7 @@ class EventCanvas:
 
   def __get_drawble_offset(self, rects: list["RectModel"], explore_rate: float = 0.5) -> int:
     offset = 0
-    step_size = round(max(rect.height for rect in rects) * explore_rate)
+    step_size = round(max(rect.height for rect in rects) * 0.1)
 
     while not self.__is_canvas_drawable(rects, offset):
       offset += step_size
