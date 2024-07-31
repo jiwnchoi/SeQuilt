@@ -128,7 +128,6 @@ def get_ids(
   corpus: list[str],
   tokenizer: BaseTokenizer,
   max_tokens: int = 16,
-  stopwords: list[str] = stopwords.words("english"),
 ) -> tuple[np.ndarray, list[np.ndarray]]:
   ids = []
   tokens = []
@@ -137,7 +136,7 @@ def get_ids(
     if isinstance(tokenizer, DNATokenizer) == "dna":
       tokenized = _process_dna(text, tokenizer, max_tokens)
     if isinstance(tokenizer, LanguageTokenizer) == "language":
-      tokenized = _process_text(text, tokenizer, max_tokens, stopwords)
+      tokenized = _process_text(text, tokenizer, max_tokens, stopwords.words("english"))
     else:
       encoded = _encode(text, tokenizer)
       tokenized = {
