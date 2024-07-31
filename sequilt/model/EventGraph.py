@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import cached_property
+from heapq import heappop, heappush
 from typing import Any, Iterable, Iterator
 
 import networkx as nx
@@ -20,11 +21,20 @@ class EventGraph(nx.Graph):
     if len(events) == 0:
       raise ValueError("No events found in the data")
 
+    self.edge_heap = []
     self.add_events_from(events)
 
   @cached_property
   def events(self) -> Iterator["Event"]:
     return self.nodes
+
+  @property
+  def sorted_edges(self) -> Iterator[tuple["Event", "Event", int | float]]:
+    while self.edge_heap:
+      weight, node1, node2 = heappop(self.edge_heap)
+      if not self.has_node(node1) or not self.has_node(node2):
+        continue
+      yield node2, node1, -weight
 
   def add_event(self, event: "Event", **attr):
     self._add_node(event, **attr)
@@ -32,6 +42,13 @@ class EventGraph(nx.Graph):
   def add_events_from(self, events: Iterable["Event"], **attr):
     for event in events:
       self.add_event(event, **attr)
+
+  def remove_event(self, event: "Event"):
+    super().remove_node(event)
+
+  def remove_events_from(self, events: Iterable["Event"]):
+    for event in events:
+      self.remove_event(event)
 
   def _count_events(self, data: np.ndarray | list[list[Any]]) -> list["Event"]:
     if not isinstance(data, np.ndarray):
@@ -65,13 +82,13 @@ class EventGraph(nx.Graph):
 
   def _add_node(self, node_for_adding: "Event", **attr):
     super().add_node(node_for_adding, **attr)
-    self._make_complete(node_for_adding)
+    self._make_adjacent_edges(node_for_adding)
 
-  def _make_complete(self, new_node: "Event"):
+  def _make_adjacent_edges(self, new_node: "Event"):
     for node in self.events:
-      if node != new_node and node.position != new_node.position:
-        weight = new_node.diff(node)
-        super().add_edge(new_node, node, weight=weight)
+      if node != new_node and abs(new_node.position - node.position) == 1:
+        super().add_edge(new_node, node, weight=new_node.diff(node))
+        heappush(self.edge_heap, (-new_node.diff(node), new_node, node))
 
   # Override to disable networkx.Graph methods
 
@@ -82,13 +99,16 @@ class EventGraph(nx.Graph):
     raise NotImplementedError(f"Cannot manually add edges in {self.__class__.__name__}")
 
   def remove_edge(self):
-    raise NotImplementedError(f"Cannot remove edges in {self.__class__.__name__}")
+    raise NotImplementedError(f"Cannot manually remove edges in {self.__class__.__name__}")
 
   def remove_edges_from(self):
-    raise NotImplementedError(f"Cannot remove edges in {self.__class__.__name__}")
+    raise NotImplementedError(f"Cannot manually remove edges in {self.__class__.__name__}")
 
   def add_node(self, node_for_adding, **attr):
     raise NotImplementedError(f"Cannot manually add nodes in {self.__class__.__name__}")
 
   def add_nodes_from(self, nodes_for_adding, **attr):
     raise NotImplementedError(f"Cannot manually add nodes in {self.__class__.__name__}")
+
+  def remove_node(self, node):
+    raise NotImplementedError(f"Cannot manually remove nodes in {self.__class__.__name__}")

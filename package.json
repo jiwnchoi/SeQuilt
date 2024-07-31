@@ -5,9 +5,9 @@
     "dev": "concurrently --kill-others \"vite\" \"hatch run jupyter lab\"",
     "build": "tsc && vite build",
     "typecheck": "tsc --noEmit",
-    "lint": "biome lint --write .",
-    "format": "biome format --write .",
-    "check": "biome check --write .",
+    "lint": "biome lint --write . && hatch run ruff check .",
+    "format": "biome format --write . && hatch run ruff format .",
+    "check": "biome check --write . && hatch run ruff check . && hatch run ruff format .",
     "prepare": "husky",
     "lint-staged": "lint-staged",
     "test": "vitest --globals"

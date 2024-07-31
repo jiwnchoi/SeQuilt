@@ -1,5 +1,7 @@
 from typing import Any, Iterable
 
+from .RectModel import RectModel
+
 
 class Event:
   def __init__(self, value: Any, position: int, occurences: Iterable) -> None:
@@ -21,13 +23,21 @@ class Event:
   def __str__(self) -> str:
     return self.__repr__()
 
-  def diff(self, e: "Event") -> tuple[int, float]:
-    # return (
-    #   abs(self.position - e.position),
-    #   jaccard_similarity_mod(self.occurences, e.occurences),
-    # )
+  def __len__(self) -> int:
+    return len(self.occurences)
+
+  def __lt__(self, other: "Event") -> bool:
+    return self.position < other.position
+
+  def diff(self, e: "Event") -> int:
     return len(self.occurences.intersection(e.occurences))
 
-  # @cached_property
-  # def is_sequlet(self) -> bool:
-  #   return len(self.occurences) > 1
+  @property
+  def rect(self) -> RectModel:
+    return RectModel(
+      value=self.value,
+      x=self.position,
+      y=0,
+      width=1,
+      height=len(self.occurences),
+    )

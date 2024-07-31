@@ -4,11 +4,13 @@ import importlib.metadata
 import json
 import os
 import pathlib
+from typing import TYPE_CHECKING
 
 import anywidget
 import traitlets
 
-from .model import LabelModel, SequletRectsModel, WidgetModel
+if TYPE_CHECKING:
+  from .model import LabelModel, RectModel
 
 try:
   __version__ = importlib.metadata.version("sequilt")
@@ -16,7 +18,7 @@ except importlib.metadata.PackageNotFoundError:
   __version__ = "unknown"
 
 
-class Sequilt(anywidget.AnyWidget, WidgetModel):
+class Sequilt(anywidget.AnyWidget):
   labels = traitlets.List([]).tag(sync=True)
   sequlets = traitlets.List([]).tag(sync=True)
 
@@ -27,7 +29,7 @@ class Sequilt(anywidget.AnyWidget, WidgetModel):
 
   def __init__(
     self,
-    sequlets: list["SequletRectsModel"] = [],
+    sequlets: list[list["RectModel"]] = [],
     labels: list["LabelModel"] = [],
     width: int = 800,
     height: int = 600,
@@ -43,7 +45,9 @@ class Sequilt(anywidget.AnyWidget, WidgetModel):
     else:
       self._esm = pathlib.Path(__file__).parent / "static" / "widget.js"
 
-    self.sequlets = [sequlet.model_dump() for sequlet in sequlets]
+    self.sequlets = [
+      {"id": 0, "rects": [rect.model_dump() for rect in sequlet]} for sequlet in sequlets
+    ]
     self.labels = [label.model_dump() for label in labels]
     self.width = width
     self.height = height

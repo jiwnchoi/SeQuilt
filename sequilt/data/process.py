@@ -1,18 +1,21 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Literal
+from typing import Any, Literal, TypedDict
 
 import numpy as np
 from nltk.corpus import stopwords
 from tokenizers import Encoding, Tokenizer
 from tqdm import tqdm
 
-from sequilt.model import TokenizedModel
-
 from .BaseTokenizer import BaseTokenizer
 from .dna import DNATokenizer
 from .language import LanguageTokenizer
+
+
+class TokenizedModel(TypedDict):
+  ids: np.ndarray
+  tokens: np.ndarray
 
 
 def _encode_batch(
