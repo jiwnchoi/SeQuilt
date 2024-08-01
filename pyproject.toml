@@ -84,7 +84,7 @@ line-ending = "auto"
 
 
 [tool.pyright]
-include = ["src/**/*.py"]
+include = ["sequilt/**/*.py"]
 exclude = ["**/node_modules",
     "**/__pycache__",
     "sequilt/experimental",
