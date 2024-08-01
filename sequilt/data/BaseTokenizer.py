@@ -33,7 +33,7 @@ class BaseTokenizer:
       return None
     return self._token_to_id[token]
 
-  def id_to_token(self, id: int) -> T | None:
+  def id_to_token(self, id: int) -> str | None:
     if id not in self._id_to_token:
       return None
     return self._id_to_token[id]

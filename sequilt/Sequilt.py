@@ -58,7 +58,7 @@ class Sequilt(anywidget.AnyWidget):
     return np.count_nonzero(self.__canvas) / self.__canvas.size
 
   @property
-  def shape(self) -> tuple[int, int]:
+  def shape(self):
     return self.canvas.shape
 
   @property

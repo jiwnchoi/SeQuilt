@@ -25,7 +25,7 @@ class EventGraph(nx.Graph):
     self.add_events_from(events)
 
   @cached_property
-  def events(self) -> Iterator["Event"]:
+  def events(self):
     return self.nodes
 
   @property
@@ -96,16 +96,16 @@ class EventGraph(nx.Graph):
 
   # Override to disable networkx.Graph methods
 
-  def add_edge(self, **attr):
+  def add_edge(self, u_of_edge, v_of_edge, **attr):
     raise NotImplementedError(f"Cannot manually add edges in {self.__class__.__name__}")
 
-  def add_edges_from(self, **attr):
+  def add_edges_from(self, ebunch_to_add, **attr):
     raise NotImplementedError(f"Cannot manually add edges in {self.__class__.__name__}")
 
-  def remove_edge(self):
+  def remove_edge(self, u, v):
     raise NotImplementedError(f"Cannot manually remove edges in {self.__class__.__name__}")
 
-  def remove_edges_from(self):
+  def remove_edges_from(self, ebunch):
     raise NotImplementedError(f"Cannot manually remove edges in {self.__class__.__name__}")
 
   def add_node(self, node_for_adding, **attr):
@@ -114,5 +114,5 @@ class EventGraph(nx.Graph):
   def add_nodes_from(self, nodes_for_adding, **attr):
     raise NotImplementedError(f"Cannot manually add nodes in {self.__class__.__name__}")
 
-  def remove_node(self, node):
+  def remove_node(self, n):
     raise NotImplementedError(f"Cannot manually remove nodes in {self.__class__.__name__}")

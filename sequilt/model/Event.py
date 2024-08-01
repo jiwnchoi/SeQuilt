@@ -12,7 +12,10 @@ class Event:
   def __hash__(self) -> int:
     return (self.position, self.value).__hash__()
 
-  def __eq__(self, other: "Event") -> bool:
+  def __eq__(self, other: object) -> bool:
+    if not isinstance(other, Event):
+      return False
+
     return self.position == other.position and self.value == other.value
 
   def __repr__(self) -> str:

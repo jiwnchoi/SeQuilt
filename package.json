@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "ANYWIDGET_DEV=1 concurrently --kill-others \"vite\" \"pnpm jupyter\"",
     "build": "tsc && vite build",
-    "typecheck": "tsc --noEmit && hatch run playright",
+    "typecheck": "tsc --noEmit && hatch run pyright",
     "jupyter": "hatch run jupyter lab --no-browser --ServerApp.log_level='CRITICAL'",
     "lint": "biome lint --write . && hatch run ruff check .",
     "format": "biome format --write . && hatch run ruff format .",
@@ -31,7 +31,8 @@
     "lit-html": "^3.1.4"
   },
   "lint-staged": {
+    "*.{ts,tsx}": ["tsc --noEmit"],
     "*.{js,ts,tsx,css,html,json}": ["vitest --globals --run related", "biome check --write"],
-    "*.{py,pyi,pyc}": ["hatch run ruff check --fix", "hatch run ruff format"]
+    "*.{py,pyi,pyc}": ["hatch run pyright", "hatch run ruff check --fix", "hatch run ruff format"]
   }
 }

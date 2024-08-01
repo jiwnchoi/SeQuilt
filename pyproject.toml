@@ -90,6 +90,7 @@ exclude = ["**/node_modules",
     "sequilt/experimental",
     "sequilt/typestubs",
     "sequilt/typings",
+    "sequilt/data",
 ]
 reportMissingImports = true
 reportMissingTypeStubs = false
