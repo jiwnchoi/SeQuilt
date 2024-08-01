@@ -1,78 +1,57 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TypeVar
 
-import numpy as np
+from .Event import Event
+from .RectModel import RectModel
 
-from ..utils import jaccard_similarity_mod
-
-if TYPE_CHECKING:
-  from .Event import Event
+T = TypeVar("T")
 
 
 class Sequlet:
+  id: int
   events: list["Event"]
-  value_sequence: np.ndarray
 
-  left_position: int
-  right_position: int
-
-  def __init__(self, event: "Event") -> None:
-    self._check_event(event)
-
-    self.events = [event]
-    self.value_sequence = np.array([event.value])
-
-    self.occurences: list[set]
-
-    self.left_position = event.position
-    self.right_position = event.position
+  def __init__(self, id: int, events: list["Event"]) -> None:
+    self.id = id
+    self.events = events
 
   def __repr__(self) -> str:
-    r = f"Sequlet(#Events={len(self.events)}, ValueSequence={self.value_sequence})"
-    r += "\n\t".join([f"{e}" for e in self.events])
-    return r
+    return f"Sequlet(events={self.events})"
 
-  def __str__(self) -> str:
-    return self.__repr__()
+  def __get_rects(self, inverse: bool = False) -> list["RectModel"]:
+    for i in range(1, len(self.events)):
+      s_event_idx = i - 1 if len(self.events[i - 1]) < len(self.events[i]) else i
+      b_event_idx = i if s_event_idx == i - 1 else i - 1
 
-  def __len__(self) -> int:
-    return len(self.events)
+      s_event = self.events[s_event_idx]
+      b_event = self.events[b_event_idx]
 
-  def __getitem__(self, index: int) -> "Event":
-    return self.events[index]
+      s_rect = self.events[s_event_idx].rect.model_copy()
+      b_rect = self.events[b_event_idx].rect.model_copy()
 
-  @cached_property
-  def left_position(self) -> int:
-    return min(e.position for e in self.events)
+      len_intersect = len(s_event.occurences.intersection(b_event.occurences))
 
-  @cached_property
-  def right_position(self) -> int:
-    return max(e.position for e in self.events)
+      if inverse and len_intersect == len(s_event):
+        s_rect.y += len(b_event) - len(s_event)
 
-  def _check_event(self, event) -> None:
-    if not isinstance(event, Event):
-      raise ValueError("Event must be of type Event.")
+      if inverse and len_intersect != len(s_event):
+        s_rect.y += len(b_event) - len_intersect
 
-    if self.events and len(self.events) and event in self.events:
-      raise ValueError("Event already exists")
+      if not inverse and len_intersect == len(s_event):
+        pass  # Remain y = 0
 
-  def append(self, event: "Event") -> None:
-    self._check_event(event)
+      if not inverse and len_intersect != len(s_event):
+        b_rect.y += len(s_event) - len_intersect
 
-    # Check appendable
-    if event.position < self.right_position:
-      raise ValueError("Event position is not appendable.")
+    return [s_rect, b_rect]
 
-    intersects = [event.occurences.intersection(e.occurences) for e in self.events]
-    intersect_sims = [jaccard_similarity_mod(i) for i in intersects]
-    print(intersects, intersect_sims)
+  @property
+  def rect_variants(self) -> list[list["RectModel"]]:
+    if len(self.events) == 0:
+      return []
 
-    # max, ...
+    if len(self.events) == 1:
+      return [[self.events[0].rect.model_copy()]]
 
-    # ..., max
-
-    # 1, 1, not 1, ...
-
-    # ..., not 1, 1, 1
+    return [self.__get_rects(), self.__get_rects(inverse=True)]

@@ -2,9 +2,10 @@
   "type": "module",
   "name": "sequilt",
   "scripts": {
-    "dev": "concurrently --kill-others \"vite\" \"hatch run jupyter lab\"",
+    "dev": "ANYWIDGET_DEV=1 concurrently --kill-others \"vite\" \"pnpm jupyter\"",
     "build": "tsc && vite build",
     "typecheck": "tsc --noEmit",
+    "jupyter": "hatch run jupyter lab --no-browser --ServerApp.log_level='CRITICAL'",
     "lint": "biome lint --write . && hatch run ruff check .",
     "format": "biome format --write . && hatch run ruff format .",
     "check": "biome check --write . && hatch run ruff check . && hatch run ruff format .",
