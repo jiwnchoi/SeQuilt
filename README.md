@@ -1,5 +1,8 @@
-# Sequilt: Abstract Overview of Large-scale Sequence Dataset
-Get the bird's eye view on a single page. 
+# Sequilt: Bird's-eye view of Large-scale Sequence Data
+Get the bird's eye view on a single page of large-scale sequence data.
+
+<img width="999" alt="image" src="https://github.com/user-attachments/assets/a00ec917-8524-417d-9abe-1fbba31b3573">
+
 
 ## Installation
 Install via PyPI
