@@ -41,7 +41,7 @@ class Sequilt(anywidget.AnyWidget):
       vite_config = json.load(open(pathlib.Path(__file__).parent.parent / "vite.config.json"))
       self._esm = f"http://localhost:{vite_config['server']['port']}/widget/widget.ts?anywidget"
     else:
-      self._esm = pathlib.Path(__file__).parent / "static" / "widget.js"
+      self._esm = (pathlib.Path(__file__).parent / "static" / "widget.js").read_text()
 
     self.labels = [label.model_dump() for label in labels]
     self.width = width
