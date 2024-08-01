@@ -1,3 +1,2 @@
-export type { IWidgetModel } from "./IWidgetModel";
-export type { default as ILabelModel } from "./ILabelModel";
-export type { default as IRectModel } from "./IRectModel";
+export type { ILabel, IPoint, IRect } from "./event";
+export type { default as IWidget } from "./IWidget";

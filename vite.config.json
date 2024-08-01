@@ -1,0 +1,24 @@
+{
+  "build": {
+    "outDir": "sequilt/static",
+    "rollupOptions": {
+      "output": {
+        "entryFileNames": "widget.js",
+        "assetFileNames": "widget.[ext]"
+      }
+    },
+    "lib": {
+      "entry": "widget/widget.ts",
+      "formats": ["es"]
+    }
+  },
+  "resolve": {
+    "alias": {
+      "@/": "/widget/"
+    }
+  },
+  "server": {
+    "host": "0.0.0.0",
+    "port": 5173
+  }
+}

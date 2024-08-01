@@ -1,23 +1,19 @@
 from __future__ import annotations
 
+from nltk.tokenize import word_tokenize
+
 from ..BaseTokenizer import BaseTokenizer
 
 
-class DNATokenizer(BaseTokenizer):
-  def __init__(self, k: int = 3):
+class LanguageTokenizer(BaseTokenizer):
+  def __init__(self):
     super().__init__()
 
-    self.k = k
-
   def encode(self, text: str) -> list[str]:
-    # Split the text into k-mers. ignore remaining characters
-    tokens = [
-      text[i * self.k : (i + 1) * self.k] for i in range(len(text) // self.k)
-    ]
-
+    tokens = word_tokenize(text)
     for token in tokens:
       if token not in self._token_to_id:
-        self._token_to_id[token] = len(self._token_to_id)
+        self._token_to_id[token] = len(self._token_to_id) + 1
         self._id_to_token[self._token_to_id[token]] = token
 
     return {
@@ -28,17 +24,15 @@ class DNATokenizer(BaseTokenizer):
   def encode_batch(self, texts: list[str]) -> list[dict]:
     return [self.encode(text) for text in texts]
 
-  def decode(
-    self, tokens: list[str] | None = None, ids: list[int] | None = None
-  ) -> str:
+  def decode(self, tokens: list[str] | None = None, ids: list[int] | None = None) -> str:
     if tokens is None and ids is None:
       raise ValueError("Either tokens or ids should be provided")
 
     if tokens is not None:
-      return "".join(tokens)
+      return " ".join(tokens)
 
     else:
-      return "".join([self._id_to_token[id] for id in ids])
+      return " ".join([self._id_to_token[id] for id in ids])
 
   def decode_batch(self, batch: list[dict]) -> list[str]:
     return [self.decode(**item) for item in batch]
@@ -58,3 +52,6 @@ class DNATokenizer(BaseTokenizer):
     if id not in self._id_to_token:
       return None
     return self._id_to_token[id]
+
+
+__all__ = ["LanguageTokenizer"]

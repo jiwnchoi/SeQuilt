@@ -1,33 +1,36 @@
 {
-	"type": "module",
-	"name": "seq",
-	"scripts": {
-		"dev": "vite",
-		"build": "tsc && vite build",
-		"typecheck": "tsc --noEmit",
-		"lint": "biome lint --write .",
-		"format": "biome format --write .",
-		"check": "biome check --write .",
-		"prepare": "husky",
-		"lint-staged": "lint-staged"
-	},
-	"devDependencies": {
-		"@anywidget/types": "^0.1.9",
-		"@anywidget/vite": "^0.2.0",
-		"@biomejs/biome": "1.8.2",
-		"@types/d3": "^7.4.3",
-		"esbuild": "^0.21.4",
-		"husky": "^9.0.11",
-		"lint-staged": "^15.2.7",
-		"typescript": "^5.4.5",
-		"vite": "^5.3.1"
-	},
-	"dependencies": {
-		"d3": "^7.9.0",
-		"lit-html": "^3.1.4"
-	},
-	"lint-staged": {
-		"*.{js,ts,tsx,css,html,json}": ["biome check --write"],
-		"*.{py,pyi,pyc}": ["hatch fmt"]
-	}
+  "type": "module",
+  "name": "sequilt",
+  "scripts": {
+    "dev": "concurrently --kill-others \"vite\" \"hatch run jupyter lab\"",
+    "build": "tsc && vite build",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome lint --write . && hatch run ruff check .",
+    "format": "biome format --write . && hatch run ruff format .",
+    "check": "biome check --write . && hatch run ruff check . && hatch run ruff format .",
+    "prepare": "husky",
+    "lint-staged": "lint-staged",
+    "test": "vitest --globals"
+  },
+  "devDependencies": {
+    "@anywidget/types": "^0.1.9",
+    "@anywidget/vite": "^0.2.0",
+    "@biomejs/biome": "1.8.3",
+    "@types/d3": "^7.4.3",
+    "concurrently": "^8.2.2",
+    "esbuild": "^0.21.4",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.7",
+    "typescript": "^5.4.5",
+    "vite": "^5.3.1",
+    "vitest": "^2.0.4"
+  },
+  "dependencies": {
+    "d3": "^7.9.0",
+    "lit-html": "^3.1.4"
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx,css,html,json}": ["vitest --globals --run related", "biome check --write"],
+    "*.{py,pyi,pyc}": ["hatch run ruff check --fix", "hatch run ruff format"]
+  }
 }

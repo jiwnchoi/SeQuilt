@@ -1,18 +1,21 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Literal
+from typing import Any, Literal, TypedDict
 
 import numpy as np
 from nltk.corpus import stopwords
 from tokenizers import Encoding, Tokenizer
 from tqdm import tqdm
 
-from seq.model import TokenizedModel
-
 from .BaseTokenizer import BaseTokenizer
 from .dna import DNATokenizer
-from .language import NLTKTokenizer
+from .language import LanguageTokenizer
+
+
+class TokenizedModel(TypedDict):
+  ids: np.ndarray
+  tokens: np.ndarray
 
 
 def _encode_batch(
@@ -94,7 +97,7 @@ def _process_dna(
 
 def _process_text(
   text: str,
-  tokenizer: NLTKTokenizer,
+  tokenizer: LanguageTokenizer,
   max_tokens: int = 16,
   stopwords: list[str] = stopwords.words("english"),
 ) -> TokenizedModel:
@@ -125,16 +128,15 @@ def get_ids(
   corpus: list[str],
   tokenizer: BaseTokenizer,
   max_tokens: int = 16,
-  stopwords: list[str] = stopwords.words("english"),
 ) -> tuple[np.ndarray, list[np.ndarray]]:
   ids = []
   tokens = []
 
   for text in tqdm(corpus):
-    if isinstance(tokenizer, DNATokenizer) == "dna":
+    if isinstance(tokenizer, DNATokenizer):
       tokenized = _process_dna(text, tokenizer, max_tokens)
-    if isinstance(tokenizer, NLTKTokenizer) == "language":
-      tokenized = _process_text(text, tokenizer, max_tokens, stopwords)
+    if isinstance(tokenizer, LanguageTokenizer):
+      tokenized = _process_text(text, tokenizer, max_tokens, stopwords.words("english"))
     else:
       encoded = _encode(text, tokenizer)
       tokenized = {
@@ -158,9 +160,7 @@ def _get_doc_term_matrix(size: tuple[int, int], ids: np.ndarray) -> np.ndarray:
 
 def _tf_idf(doc_term_matrix: np.ndarray) -> np.ndarray:
   tf = doc_term_matrix / np.sum(doc_term_matrix, axis=1)[:, np.newaxis]
-  idf = np.log(
-    doc_term_matrix.shape[0] / (1 + np.sum(doc_term_matrix > 0, axis=0))
-  )
+  idf = np.log(doc_term_matrix.shape[0] / (1 + np.sum(doc_term_matrix > 0, axis=0)))
   return tf * idf
 
 
@@ -168,7 +168,7 @@ def get_tokenizer(
   type: Literal["language", "dna"] | str, *args, **kwargs
 ) -> BaseTokenizer | Tokenizer:
   if type == "language":
-    return NLTKTokenizer(*args, **kwargs)
+    return LanguageTokenizer(*args, **kwargs)
   if type == "dna":
     return DNATokenizer(*args, **kwargs)
   else:

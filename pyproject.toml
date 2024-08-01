@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "seq"
+name = "sequilt"
 version = "0.0.0"
-dependencies = ["anywidget", "datasets", "pandas", "tokenizers", "nltk", "networkx"]
+dependencies = ["anywidget", "datasets", "pandas", "tokenizers", "nltk", "networkx", "pydantic"]
 readme = "README.md"
 
 [project.optional-dependencies]
@@ -18,12 +18,12 @@ features = ["dev"]
 
 [tool.hatch.build]
 only-packages = true
-artifacts = ["src/seq/static/*"]
+artifacts = ["src/sequilt/static/*"]
 
 [tool.hatch.build.hooks.jupyter-builder]
 build-function = "hatch_jupyter_builder.npm_builder"
-ensured-targets = ["src/seq/static/widget.js"]
-skip-if-exists = ["src/seq/static/widget.js"]
+ensured-targets = ["src/sequilt/static/widget.js"]
+skip-if-exists = ["src/sequilt/static/widget.js"]
 dependencies = ["hatch-jupyter-builder>=0.5.0"]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
@@ -33,7 +33,7 @@ build_cmd = "build"
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
-src = ["seq", "stubs"]
+src = ["sequilt", "stubs"]
 extend-include = ["*.pyi"]
 
 exclude = [
@@ -67,7 +67,7 @@ exclude = [
 ]
 
 # Same as Black.
-line-length = 80
+line-length = 100
 indent-width = 2
 
 # Assume Python 3.8
@@ -103,9 +103,9 @@ line-ending = "auto"
 include = ["src/**/*.py"]
 exclude = ["**/node_modules",
     "**/__pycache__",
-    "seq/experimental",
-    "seq/typestubs",
-    "seq/typings",
+    "sequilt/experimental",
+    "sequilt/typestubs",
+    "sequilt/typings",
 ]
 reportMissingImports = true
 reportMissingTypeStubs = false

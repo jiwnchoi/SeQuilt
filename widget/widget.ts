@@ -1,34 +1,38 @@
-import type { IWidgetModel } from "@/model";
+import type { IWidget } from "@/model";
+import { getRescaledSequlets } from "@/utils";
 import { Legend, Sequence } from "@/view";
 import type { RenderProps } from "@anywidget/types";
 import { html, render } from "lit-html";
 
-function renderWidget({ model, el }: RenderProps<IWidgetModel>) {
-	const widget = document.createElement("div");
-	widget.id = "widget";
+function renderWidget({ model, el }: RenderProps<IWidget>) {
+  const widget = document.createElement("div");
 
-	const width = model.get("width");
-	const height = model.get("height");
+  const width = model.get("width");
+  const height = model.get("height");
 
-	const sequenceView = new Sequence(width, height);
-	const legendView = new Legend();
+  const sequenceView = new Sequence(width, height);
+  const legendView = new Legend();
 
-	model.on("change:rects", () => {
-		sequenceView._render(model);
-	});
-	model.on("change:grid", () => {
-		sequenceView._render(model);
-	});
+  model.on("change:labels", (_, labels) => {
+    legendView.render(labels);
+  });
 
-	render(
-		html`
-        <div id="sequences-view" style="background-color: transparent;">
-          ${legendView.render(model.get("labels"))}
-          ${sequenceView.render(model)}
-        </div>`,
-		widget,
-	);
-	el.appendChild(widget);
+  model.on("change:sequlets", (_, sequlets) => {
+    sequenceView.render(getRescaledSequlets(sequlets, model.get("labels"), width, height));
+  });
+
+  render(
+    html`
+      ${legendView.render(model.get("labels"))}
+      <div id="sequenceView" style="padding:10px;">
+        ${sequenceView.render(
+          getRescaledSequlets(model.get("sequlets"), model.get("labels"), width, height),
+        )}
+      </div>
+    `,
+    widget,
+  );
+  el.appendChild(widget);
 }
 
 export default { render: renderWidget };
