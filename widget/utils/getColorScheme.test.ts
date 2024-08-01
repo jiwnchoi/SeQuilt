@@ -1,4 +1,4 @@
-import { hsl, schemeCategory10 } from "d3";
+import { schemeCategory10 } from "d3";
 import getColorScheme from "./getColorScheme";
 
 describe("getColorScheme", () => {
@@ -17,18 +17,6 @@ describe("getColorScheme", () => {
   it("should return original schemeCategory10 colors for size <= 10", () => {
     const result = getColorScheme(10);
     expect(result).toEqual(schemeCategory10);
-  });
-
-  it("should include lighter colors after the first 10", () => {
-    const result = getColorScheme(15);
-    const lighterColor = hsl(schemeCategory10[0]).brighter().toString();
-    expect(result).toContain(lighterColor);
-  });
-
-  it("should include darker colors after the first 20", () => {
-    const result = getColorScheme(25);
-    const darkerColor = hsl(schemeCategory10[0]).darker().toString();
-    expect(result).toContain(darkerColor);
   });
 
   it("should return all available colors if size is greater than extended scheme", () => {

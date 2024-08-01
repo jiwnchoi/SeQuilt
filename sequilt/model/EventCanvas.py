@@ -83,7 +83,6 @@ class EventCanvas:
 
     idx = min(range(len(y_offsets)), key=lambda i: y_offsets[i])
     y_offset = y_offsets[idx]
-
     for rect in rect_variants[idx]:
       rect.y += y_offset
       self.__draw_rect(rect)

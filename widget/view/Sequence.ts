@@ -1,16 +1,45 @@
-import type { ISequlet } from "@/model/event";
+import type { IRect, ISequlet } from "@/model/event";
 import { getOutline } from "@/services";
-import { create } from "d3";
+import { type BaseType, type Selection, create } from "d3";
+
+const DURATION = 150;
 
 class Sequence {
-  svg: d3.Selection<SVGSVGElement, undefined, null, undefined>;
+  svg: Selection<SVGSVGElement, undefined, null, undefined>;
+  rects: Selection<SVGRectElement | BaseType, IRect, SVGElement, undefined>;
+  paths: Selection<SVGPathElement | BaseType, ISequlet, SVGElement, undefined>;
+  selected: ISequlet | undefined;
+  bg: Selection<SVGRectElement, undefined, null, undefined>;
+
+  g_rects: Selection<SVGGElement, undefined, null, undefined>;
+  g_paths: Selection<SVGGElement, undefined, null, undefined>;
 
   constructor(width: number, height: number) {
     this.svg = create("svg").attr("viewBox", [0, 0, width, height].join(" "));
+    this.selected = undefined;
+
+    // add transparent background to svg
+    this.bg = this.svg
+      .append("rect")
+      .attr("id", "sequenceBg")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("fill", "transparent")
+      .on("click", () => {
+        this.rects.transition().duration(DURATION).attr("opacity", 1);
+        this.paths.transition().duration(DURATION).attr("opacity", 1);
+        this.selected = undefined;
+      });
+
+    this.g_rects = this.svg.append("g");
+    this.g_paths = this.svg.append("g");
+
+    this.rects = this.g_rects.selectAll("rect");
+    this.paths = this.g_paths.selectAll("path");
   }
 
   _renderRects(sequlets: ISequlet[]) {
-    this.svg
+    this.rects = this.g_rects
       .selectAll("rect")
       .data(sequlets.flatMap(sequlet => sequlet.rects))
       .join("rect")
@@ -22,14 +51,36 @@ class Sequence {
   }
 
   _renderPaths(sequlets: ISequlet[]) {
-    this.svg
+    this.paths = this.g_paths
       .selectAll("path")
       .data(sequlets)
       .join("path")
       .attr("d", d => getOutline(d.rects))
-      .attr("fill", "none")
+      .attr("fill", "transparent")
       .attr("stroke", "#333333")
-      .attr("stroke-width", "2");
+      .attr("stroke-width", "1.5");
+
+    this._addSequletClickEvent();
+  }
+
+  _addSequletClickEvent() {
+    this.paths.on("click", (_, d) => {
+      if (this.selected && this.selected === d) {
+        this.rects.transition().duration(DURATION).attr("opacity", 1);
+        this.paths.transition().duration(DURATION).attr("opacity", 1);
+        this.selected = undefined;
+      } else {
+        this.rects
+          .transition()
+          .duration(DURATION)
+          .attr("opacity", rect => (d.rects.includes(rect) ? 1 : 0.1));
+        this.paths
+          .transition()
+          .duration(DURATION)
+          .attr("opacity", path => (path === d ? 1 : 0.1));
+        this.selected = d;
+      }
+    });
   }
 
   render(sequlets: ISequlet[]) {
