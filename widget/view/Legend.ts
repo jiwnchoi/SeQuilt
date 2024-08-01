@@ -1,5 +1,5 @@
 import type { ILabel } from "@/model";
-import { schemeCategory10 } from "d3";
+import { getColorScheme } from "@/utils";
 import { html } from "lit-html";
 import { repeat } from "lit-html/directives/repeat.js";
 import { styleMap } from "lit-html/directives/style-map.js";
@@ -9,6 +9,7 @@ const ulStyle = {
   padding: "0",
   display: "flex",
   flexDirection: "row",
+  flexWrap: "wrap",
   gap: "8px",
 };
 
@@ -33,7 +34,7 @@ class Legend {
   }
 
   render(labels: ILabel[]) {
-    const colorScale = schemeCategory10;
+    const colorScale = getColorScheme(labels.length);
     const size = 10;
     return html`
       <ul style=${styleMap(ulStyle)}>

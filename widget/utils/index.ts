@@ -1,2 +1,1 @@
-export { getOutlinePoints, getOutline } from "./getOutline";
-export { default as getRescaledSequlets } from "./getRescaledSequlets";
+export { default as getColorScheme } from "./getColorScheme";

@@ -1,5 +1,5 @@
 import type { IWidget } from "@/model";
-import { getRescaledSequlets } from "@/utils";
+import { getRescaledSequlets } from "@/services";
 import { Legend, Sequence } from "@/view";
 import type { RenderProps } from "@anywidget/types";
 import { html, render } from "lit-html";

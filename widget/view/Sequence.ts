@@ -1,5 +1,5 @@
 import type { ISequlet } from "@/model/event";
-import { getOutline } from "@/utils";
+import { getOutline } from "@/services";
 import { create } from "d3";
 
 class Sequence {
