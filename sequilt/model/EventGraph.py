@@ -75,6 +75,7 @@ class EventGraph(nx.Graph):
             np.argwhere(data[:, position] == value).flatten().tolist(),
           )
           for value in unique
+          if value
         ]
       )
 
@@ -87,8 +88,11 @@ class EventGraph(nx.Graph):
   def _make_adjacent_edges(self, new_node: "Event"):
     for node in self.events:
       if node != new_node and abs(new_node.position - node.position) == 1:
-        super().add_edge(new_node, node, weight=new_node.diff(node))
-        heappush(self.edge_heap, (-new_node.diff(node), new_node, node))
+        diff = new_node.diff(node)
+        if diff == 0:
+          continue
+        super().add_edge(new_node, node, weight=diff)
+        heappush(self.edge_heap, (-diff, new_node, node))
 
   # Override to disable networkx.Graph methods
 

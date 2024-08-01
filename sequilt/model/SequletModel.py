@@ -8,11 +8,14 @@ class SequletModel:
   def __init__(self, events: list["Event"]) -> None:
     self.events = events
 
+  def __repr__(self) -> str:
+    return f"SequletModel(events={self.events})"
+
   def __get_rect_variants(self, inverse: bool = False) -> list["RectModel"]:
     rects = [e.rect.model_copy() for e in self.events][:: (-1 if inverse else 1)]
 
     for i in range(1, len(rects)):
-      rects[i].y += len(self.events[i].occurences.difference(self.events[i - 1].occurences))
+      rects[i].y += len(self.events[i - 1].occurences.difference(self.events[i].occurences))
 
     return rects
 

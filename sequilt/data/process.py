@@ -133,9 +133,9 @@ def get_ids(
   tokens = []
 
   for text in tqdm(corpus):
-    if isinstance(tokenizer, DNATokenizer) == "dna":
+    if isinstance(tokenizer, DNATokenizer):
       tokenized = _process_dna(text, tokenizer, max_tokens)
-    if isinstance(tokenizer, LanguageTokenizer) == "language":
+    if isinstance(tokenizer, LanguageTokenizer):
       tokenized = _process_text(text, tokenizer, max_tokens, stopwords.words("english"))
     else:
       encoded = _encode(text, tokenizer)
