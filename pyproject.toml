@@ -9,7 +9,7 @@ dependencies = ["anywidget", "networkx", "pydantic"]
 readme = "README.md"
 
 [project.optional-dependencies]
-dev = ["watchfiles", "jupyterlab", "ruff", "pyright", "datasets", "pandas", "tokenizers", "nltk" ]
+dev = ["watchfiles", "jupyterlab", "ruff", "pyright", "datasets", "pandas", "tokenizers", "nltk", "pytest"]
 
 # automatically add the dev feature to the default env (e.g., hatch shell)
 [tool.hatch.envs.default]
