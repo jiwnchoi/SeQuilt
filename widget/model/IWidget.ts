@@ -1,4 +1,5 @@
-import type { ILabel, ISequlet } from "./event";
+import type ILabel from "./ILabel";
+import type ISequlet from "./ISequlet";
 
 interface IWidget {
   labels: ILabel[];

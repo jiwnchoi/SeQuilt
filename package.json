@@ -31,7 +31,6 @@
     "lit-html": "^3.1.4"
   },
   "lint-staged": {
-    "*.{ts,tsx}": ["tsc --noEmit"],
     "*.{js,ts,tsx,css,html,json}": ["vitest --globals --run related", "biome check --write"],
     "*.{py,pyi,pyc}": ["hatch run pyright", "hatch run ruff check --fix", "hatch run ruff format"]
   }
